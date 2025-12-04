@@ -14,7 +14,117 @@ datasource db {
 }
 
 model User {
-  id    String @id @default(cuid())
-  email String @unique
-  name  String
+  id            String        @id @default(cuid())
+  name          String?
+  email         String?       @unique
+  emailVerified DateTime?
+  phone         String?
+  image         String?
+  preferences   Json? // e.g., favorite drinks, milk preference
+  orders        Order[]
+  reservations  Reservation[]
+  // accounts      Account[]
+  // sessions      Session[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+model Product {
+  id          String      @id @default(cuid())
+  name        String
+  description String?
+  price       Decimal     @db.Decimal(10, 2)
+  category    Category    @relation(fields: [categoryId], references: [id])
+  categoryId  String
+  imageUrl    String?
+  isActive    Boolean     @default(true)
+  // inventory   Inventory?
+  orderItems  OrderItem[]
+  createdAt   DateTime    @default(now())
+}
+
+model Category {
+  id       String    @id @default(cuid())
+  name     String // e.g., "Coffee", "Tea", "Pastries"
+  slug     String    @unique
+  products Product[]
+}
+
+model Order {
+  id          String        @id @default(cuid())
+  user        User?         @relation(fields: [userId], references: [id])
+  userId      String?
+  orderNumber String        @unique
+  items       OrderItem[]
+  totalAmount Decimal       @db.Decimal(10, 2)
+  status      OrderStatus   @default(PENDING)
+  store       StoreLocation @relation(fields: [storeId], references: [id])
+  storeId     String
+  pickupTime  DateTime? // For pre-orders
+  createdAt   DateTime      @default(now())
+
+  @@index([userId])
+  @@index([status])
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  order     Order   @relation(fields: [orderId], references: [id])
+  orderId   String
+  product   Product @relation(fields: [productId], references: [id])
+  productId String
+  quantity  Int
+  price     Decimal @db.Decimal(10, 2) // Price at time of order
+}
+
+model Reservation {
+  id              String            @id @default(cuid())
+  user            User              @relation(fields: [userId], references: [id])
+  userId          String
+  store           StoreLocation     @relation(fields: [storeId], references: [id])
+  storeId         String
+  partySize       Int
+  reservationTime DateTime
+  status          ReservationStatus @default(CONFIRMED)
+  notes           String?
+  createdAt       DateTime          @default(now())
+
+  @@index([reservationTime])
+  @@index([userId])
+}
+
+model StoreLocation {
+  id           String        @id @default(cuid())
+  name         String
+  address      String
+  phone        String
+  hours        Json // Opening hours by day
+  coordinates  String? // For maps integration
+  isActive     Boolean       @default(true)
+  orders       Order[]
+  reservations Reservation[]
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PREPARING
+  READY_FOR_PICKUP
+  COMPLETED
+  CANCELLED
+}
+
+enum ReservationStatus {
+  CONFIRMED
+  SEATED
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum UserRole {
+  SUPERADMIN
+  ADMIN
+  USER
+  CASHIER
 }
