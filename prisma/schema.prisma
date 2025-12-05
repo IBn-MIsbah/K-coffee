@@ -29,8 +29,9 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  sessions Session[]
-  accounts Account[]
+  sessions  Session[]
+  accounts  Account[]
+  auditLogs AuditLog[]
 
   @@map("user")
 }
@@ -181,4 +182,40 @@ model Verification {
 
   @@index([identifier])
   @@map("verification")
+}
+
+model Permission {
+  id          String  @id @default(cuid())
+  action      String // e.g., "order:create", "order:view", "user:manage"
+  resource    String // e.g., "orders", "users", "products", "reservations"
+  description String?
+
+  // Role-based permissions (many-to-many with UserRole enum)
+  allowedRoles UserRole[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([action, resource])
+  @@map("permission")
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String?
+  userRole   UserRole
+  action     String
+  resource   String
+  resourceId String?
+  details    Json?
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([action, resource])
+  @@index([createdAt])
+  @@map("audit_log")
 }
