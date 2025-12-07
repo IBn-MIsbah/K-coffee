@@ -17,7 +17,7 @@ model User {
   id            String    @id @default(cuid())
   name          String?
   email         String?   @unique
-  emailVerified DateTime?
+  emailVerified Boolean?
   phone         String?
   image         String?
   preferences   Json? // e.g., favorite drinks, milk preference
@@ -38,7 +38,7 @@ model User {
 
 model Product {
   id          String      @id @default(cuid())
-  name        String
+  name        String      @unique
   description String?
   price       Decimal     @db.Decimal(10, 2)
   category    Category    @relation(fields: [categoryId], references: [id])
