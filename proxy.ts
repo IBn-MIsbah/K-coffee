@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "./lib/auth";
 import { hasPermission, logAudit, UserRole } from "./lib/rbac";
+import { headers } from "next/headers";
 
 const routePermission: Record<
   string,
@@ -59,7 +60,7 @@ export async function proxy(request: NextRequest) {
 
     //Get session
     const session = await auth.api.getSession({
-      headers: request.headers,
+      headers: await headers(),
     });
 
     if (!session?.user) {
