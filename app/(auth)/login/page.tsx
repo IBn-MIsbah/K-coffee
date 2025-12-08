@@ -1,4 +1,3 @@
-import { signInAction } from "@/actions/auth";
 import LoginForm from "@/components/forms/LoginForm";
 import { Metadata } from "next";
 
@@ -7,7 +6,7 @@ export const metadata: Metadata = {
 };
 
 const LoginPage = async () => {
-  return <LoginForm action={signInAction} />;
+  return <LoginForm />;
 };
 
 export default LoginPage;
