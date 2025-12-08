@@ -2,8 +2,6 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import prisma from "./prisma";
-import { UserRole } from "./rbac";
-import { User } from "@/types";
 import { nextCookies } from "better-auth/next-js";
 
 export const auth = betterAuth({
@@ -18,30 +16,14 @@ export const auth = betterAuth({
     updateAge: 60 * 60 * 24,
   },
   plugins: [nextCookies()],
-  callbacks: {
-    session: async (session: any, user: User) => {
-      const dbUser = await prisma.user.findUnique({
-        where: { id: user.id },
-        select: { role: true },
-      });
-
-      return {
-        ...session,
-        user: {
-          ...session.user,
-          role: dbUser?.role || UserRole.USER,
-          id: user.id,
-        },
-      };
-    },
-    user: async (user: any) => {
-      if (!user.role) {
-        await prisma.user.update({
-          where: { id: user.id },
-          data: { role: UserRole.USER },
-        });
-      }
-      return user;
+  user: {
+    additionalFields: {
+      role: {
+        type: "string",
+        required: false,
+        defaultValue: "USER",
+        input: false,
+      },
     },
   },
 });
