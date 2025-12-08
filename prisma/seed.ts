@@ -1,14 +1,12 @@
 import prisma from "@/lib/prisma";
 import { initializePermissions, UserRole } from "@/lib/rbac";
-import { hash } from "bcryptjs"; // Match hashing used by your Better Auth config
+import { auth } from "@/lib/auth";
 
 async function seed() {
   console.log("Seeding database...");
 
   // Initialize RBAC permissions
   await initializePermissions();
-
-  const saltRounds = 10;
 
   // 1. Setup Admin and Cashier configuration
   const initialUsers = [
@@ -17,14 +15,12 @@ async function seed() {
       name: "Super Admin",
       role: UserRole.SUPERADMIN,
       password: "Admin123!",
-      accountId: "admin_credential_id",
     },
     {
       email: "cashier@coffeeshop.com",
       name: "John Cashier",
       role: UserRole.CASHIER,
       password: "Cashier123!",
-      accountId: "cashier_credential_id",
     },
   ];
 
@@ -34,23 +30,20 @@ async function seed() {
     });
 
     if (!existing) {
-      const hashedPassword = await hash(userData.password, saltRounds);
-
       // Creating the user and linking the account exactly how Better Auth expects
-      await prisma.user.create({
-        data: {
+      await auth.api.signUpEmail({
+        body: {
           email: userData.email,
+          password: userData.password,
           name: userData.name,
+        },
+      });
+
+      await prisma.user.update({
+        where: { email: userData.email },
+        data: {
           role: userData.role,
-          emailVerified: new Date(),
-          accounts: {
-            create: {
-              id: `acc_${userData.accountId}`,
-              accountId: userData.accountId,
-              providerId: "credential", // Better Auth uses this identifier for email/pass
-              password: hashedPassword, // Matches the password field in your Account model
-            },
-          },
+          emailVerified: true,
         },
       });
       console.log(`${userData.name} created.`);
@@ -93,5 +86,10 @@ async function seed() {
 }
 
 seed()
-  .catch(console.error)
-  .finally(() => process.exit());
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });
