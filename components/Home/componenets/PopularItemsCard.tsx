@@ -23,7 +23,7 @@ const PopularItemsCard = ({
       <Avatar className="flex justify-center items-center mb-6">
         {imageUrl ? (
           <AvatarImage
-            className="rounded-full w-56 h-56 object-cover ring-4 ring-amber-200 shadow-md"
+            className="rounded-full w-56 h-56 object-cover ring-4 ring-amber-200 shadow-md cursor-pointer"
             src={imageUrl}
             id={id}
             alt={name}
@@ -36,7 +36,7 @@ const PopularItemsCard = ({
       </Avatar>
 
       <CardTitle
-        className="text-3xl font-serif font-bold text-amber-950 mb-2 tracking-wide"
+        className="text-3xl font-serif font-bold text-amber-950 mb-2 tracking-wide cursor-pointer"
         id={id}
       >
         {name}
