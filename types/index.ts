@@ -34,6 +34,21 @@ export type User = {
   updatedAt: Date;
 };
 
+export interface Product {
+  id: string;
+  name: string;
+  description: string | null;
+  price: number; // Mapped from Decimal
+  categoryId: string;
+  imageUrl: string | null;
+  isActive: boolean;
+  createdAt: Date;
+
+  // Relation fields:
+  category: Category;
+  orderItems: OrderItem[];
+}
+
 export type Order = {
   id: string;
   userId: string | null;
@@ -49,6 +64,8 @@ export type Category = {
   id: string;
   name: string;
   slug: string;
+  // Relation fields:
+  products: Product[];
 };
 
 export type StoreLocation = {
@@ -59,6 +76,10 @@ export type StoreLocation = {
   hours: Prisma.JsonValue;
   coordinates: string | null;
   isActive: boolean;
+
+  // Relation fields:
+  orders: Order[];
+  reservations: Reservation[];
 };
 
 export type UserWithRelations = Prisma.UserGetPayload<{
@@ -87,6 +108,10 @@ export type OrderItem = {
   productId: string;
   quantity: number; // Int maps to number
   price: Prisma.Decimal;
+
+  // Relation fields:
+  order: Order;
+  product: Product;
 };
 
 export type Reservation = {
@@ -98,6 +123,10 @@ export type Reservation = {
   status: ReservationStatus;
   notes: string | null;
   createdAt: Date;
+
+  // Relation fields:
+  user: User;
+  store: StoreLocation;
 };
 
 export type Session = {
