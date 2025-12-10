@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "postbuild": "npx prisma migrate deploy",
     "start": "next start",
     "lint": "eslint",
     "prisma:studio": "prisma studio",
