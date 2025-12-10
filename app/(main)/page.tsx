@@ -1,3 +1,4 @@
+import Footer from "@/components/Home/componenets/Footer";
 import Header from "@/components/Home/componenets/Header";
 import PopularItemsCard from "@/components/Home/componenets/PopularItemsCard";
 import { Button } from "@/components/ui/button";
@@ -21,7 +22,7 @@ import { Coffee } from "lucide-react";
 export default async function Home() {
   return (
     <div>
-      <section className="bg-[url(/img/Hero3.jpg)] min-h-96 sm:h-140 bg-no-repeat bg-cover bg-center flex flex-col">
+      <section className="bg-[url(/img/Hero3.png)] min-h-96 sm:h-140 bg-no-repeat bg-cover bg-center flex flex-col">
         <Header />
         <div className="flex bg-transparent p-4 sm:px-28 sm:py-10 grow justify-start items-start bg-linear-to-r from-black/60 to-transparent">
           {/* Slogan Container */}
@@ -74,16 +75,33 @@ export default async function Home() {
           ))}
         </div>
       </section>
-      {/* <section> */}
-      {/* {card components} */}
-      {/* comments */}
-      {/* </section> */}
+      <section>
+        {/* footer and social links */}
+        {/**call to action buttons  */}
+        <div className="flex flex-col justify-center items-center bg-amber-800/80 py-16 px-4">
+          <div className="font-extrabold text-4xl sm:text-6xl text-amber-100 text-center mb-6">
+            Ready for Your Coffee?
+          </div>
 
-      {/* <section> */}
-      {/* footer and social links */}
-      {/**call to action buttons  */}
-      {/**footer */}
-      {/* </section> */}
+          <div className="flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-8">
+            <div className="mt-4">
+              <Button className="rounded-full font-bold bg-amber-100 text-amber-950 hover:bg-amber-300 px-10 py-3 text-base sm:text-lg transition-all duration-300 shadow-lg hover:shadow-xl">
+                Order Online
+              </Button>
+            </div>
+
+            <div className="mt-4">
+              <Button className="rounded-full font-bold bg-amber-950 text-amber-100 border-2 border-amber-100 hover:bg-amber-900 px-10 py-3 text-base sm:text-lg transition-all duration-300 shadow-lg hover:shadow-xl">
+                Visit Us Today
+              </Button>
+            </div>
+          </div>
+        </div>
+        {/**footer */}
+        <div className="py-10 bg-amber-950">
+          <Footer />
+        </div>
+      </section>
     </div>
   );
 }
