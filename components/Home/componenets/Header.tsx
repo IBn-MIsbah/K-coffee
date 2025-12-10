@@ -107,7 +107,7 @@ const Header = () => {
 
       {/* Tablet/Mobile Sidebar */}
       <aside
-        className={`fixed top-0 right-0 h-full w-full sm:w-80 md:w-96 bg-gradient-to-b from-amber-800 to-amber-900 shadow-2xl transform transition-transform duration-300 ease-in-out z-60 ${
+        className={`fixed top-0 right-0 h-full w-full sm:w-80 md:w-96 bg-linear-to-b from-amber-800 to-amber-900 shadow-2xl transform transition-transform duration-300 ease-in-out z-60 ${
           isOpen ? "translate-x-0" : "translate-x-full"
         } sm:hidden md:hidden`}
       >
