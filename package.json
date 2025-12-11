@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "npm run db:setup && next build",
-    "postbuild": "npm run db:setup && prisma migrate deploy",
+    "build": "prisma generate && next build",
+    "postbuild": "prisma migrate db:setup",
     "start": "next start",
     "lint": "eslint",
     "prisma:studio": "prisma studio",
@@ -14,7 +14,7 @@
     "prisma:migrate": "prisma migrate dev",
     "db:seed": "prisma db seed",
     "db:reset": "npx prisma migrate reset && npm run seed",
-    "db:setup": "npx prisma migrate deploy && npm run db:seed"
+    "db:setup": "prisma migrate deploy && npm run db:seed"
   },
   "prisma": {
     "seed": "npm run seed"
