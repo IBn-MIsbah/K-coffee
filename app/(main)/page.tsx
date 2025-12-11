@@ -11,6 +11,8 @@ import {
   Phone,
 } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 export default async function Home() {
   // Fetch popular products or all products
   const products = await prisma.product.findMany({
