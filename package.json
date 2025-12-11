@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",
-    "postbuild": "prisma migrate db:setup",
+    "postbuild": "npm run db:setup",
     "start": "next start",
     "lint": "eslint",
     "prisma:studio": "prisma studio",
