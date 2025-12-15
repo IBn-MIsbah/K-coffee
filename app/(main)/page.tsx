@@ -1,8 +1,8 @@
 import Footer from "@/components/Home/componenets/Footer";
 import Header from "@/components/Home/componenets/Header";
 import PopularItemsCard from "@/components/Home/componenets/PopularItemsCard";
+import { PopularItemsCardSkeleton } from "@/components/Home/skeloton/PopularItemsCardSkeloton";
 import { Button } from "@/components/ui/button";
-import prisma from "@/lib/prisma";
 import {
   Coffee,
   Coffee as CoffeeIcon,
@@ -10,18 +10,11 @@ import {
   MapPin,
   Phone,
 } from "lucide-react";
+import { Suspense } from "react";
 
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  // Fetch popular products or all products
-  const products = await prisma.product.findMany({
-    take: 8, // Limit to 8 products for better display
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
-
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -114,18 +107,10 @@ export default async function Home() {
           </div>
 
           {/* Products Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-8 md:gap-10">
-            {products.map((product) => (
-              <PopularItemsCard
-                key={product.id}
-                id={product.id}
-                name={product.name}
-                imageUrl={product.imageUrl}
-                description={product.description}
-                // className="transform transition-all duration-300 hover:scale-105 hover:shadow-2xl"
-              />
-            ))}
-          </div>
+
+          <Suspense fallback={<PopularItemsCardSkeleton />}>
+            <PopularItemsCard />
+          </Suspense>
 
           {/* View More Button */}
           <div className="text-center mt-12 sm:mt-16 md:mt-20">
