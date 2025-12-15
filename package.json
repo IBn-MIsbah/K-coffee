@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && next build",
+    "build": "next build",
+    "postinstall": "prisma generate",
     "start": "next start",
     "lint": "eslint",
     "prisma:studio": "prisma studio",
@@ -16,7 +17,7 @@
     "db:setup": "prisma migrate deploy && npm run db:seed"
   },
   "prisma": {
-    "seed": "npm run seed"
+    "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.1.0",
