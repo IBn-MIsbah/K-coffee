@@ -8,6 +8,7 @@ import {
   MapPin,
   Phone,
 } from "lucide-react";
+import Link from "next/link";
 import { Suspense } from "react";
 
 export const dynamic = "force-dynamic";
@@ -52,13 +53,13 @@ export default async function Home() {
             <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 mt-6 sm:mt-8">
               <Button className="rounded-full bg-amber-400 hover:bg-amber-500 text-amber-950 font-bold px-8 sm:px-10 py-3 sm:py-4 text-base sm:text-lg md:text-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
                 <Coffee className="w-5 h-5 sm:w-6 sm:h-6 mr-2" />
-                Order Online Now
+                <Link href={"/dashboard"}>Order Online </Link>
               </Button>
               <Button
                 variant="outline"
                 className="rounded-full border-2 border-amber-400 text-amber-400 hover:bg-amber-400/10 font-bold px-8 sm:px-10 py-3 sm:py-4 text-base sm:text-lg md:text-xl transition-all duration-300 transform hover:scale-105"
               >
-                View Our Menu
+                <Link href={"/menu"}>View Our Menu</Link>
               </Button>
             </div>
           </div>
@@ -113,7 +114,7 @@ export default async function Home() {
               variant="outline"
               className="rounded-full border-2 border-amber-600 text-amber-600 hover:bg-amber-600 hover:text-amber-50 px-8 sm:px-10 py-3 sm:py-4 text-base sm:text-lg font-semibold transition-all duration-300"
             >
-              View Full Menu
+              <Link href={"/menu"}>View Full Menu </Link>
             </Button>
           </div>
         </div>
@@ -176,7 +177,7 @@ export default async function Home() {
           <div className="flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-6 md:gap-8">
             <Button className="rounded-full font-bold bg-amber-400 hover:bg-amber-500 text-amber-950 px-10 sm:px-12 py-4 sm:py-5 text-lg sm:text-xl md:text-2xl transition-all duration-300 transform hover:scale-105 shadow-2xl hover:shadow-3xl">
               <Coffee className="w-6 h-6 sm:w-7 sm:h-7 mr-3" />
-              Order Online
+              <Link href={"/dashboard"}>Order Online </Link>
             </Button>
 
             <Button className="rounded-full font-bold bg-transparent border-2 border-amber-400 text-amber-400 hover:bg-amber-400/10 px-10 sm:px-12 py-4 sm:py-5 text-lg sm:text-xl md:text-2xl transition-all duration-300 transform hover:scale-105">
