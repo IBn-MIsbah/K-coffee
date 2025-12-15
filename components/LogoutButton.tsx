@@ -24,7 +24,7 @@ export function LogoutButton({
     try {
       const result = await signOut();
       if (!result.error) {
-        router.push("/login");
+        router.push("/");
         router.refresh();
       }
     } catch (error) {
