@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import prisma from "@/lib/prisma";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 export const GET = async (req: NextRequest) => {
   const searchParams = req.nextUrl.searchParams;
@@ -36,7 +36,7 @@ export const GET = async (req: NextRequest) => {
         createdAt: "desc",
       },
     });
-    return Response.json(
+    return NextResponse.json(
       {
         success: true,
         data: products,
@@ -46,7 +46,7 @@ export const GET = async (req: NextRequest) => {
     );
   } catch (error) {
     console.log("Error fetching products: ", error);
-    return Response.json(
+    return NextResponse.json(
       {
         success: false,
         message: "Failed to retrive products due to a server error",
