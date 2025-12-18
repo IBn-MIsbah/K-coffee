@@ -8,6 +8,7 @@ import { signIn } from "@/lib/auth-client"; // Use the client library
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { FieldDescription, Field, FieldLabel } from "../ui/field";
+import { toast } from "sonner";
 
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -34,9 +35,16 @@ const LoginForm = () => {
 
       if (result.error) {
         setError(result.error.message || "Invalid email or password");
+        toast.error(result.error.message, {
+          duration: 3000,
+        });
       } else {
         // 2. SUCCESSFUL LOGIN - SYNC COOKIE AND REDIRECT
         // We add a small delay to ensure the DB write is confirmed, like your register form
+        toast.success("Login successfully!", {
+          description: "Rdirecting to Dashboard...",
+          duration: 3000,
+        });
         setTimeout(() => {
           router.push("/dashboard");
           router.refresh();
@@ -70,16 +78,16 @@ const LoginForm = () => {
             <p className="text-gray-500">Sign in to your account</p>
           </div>
 
-          {error && (
+          {/* {error && (
             <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
               <p className="text-red-600 text-sm font-medium">{error}</p>
             </div>
-          )}
+          )} */}
 
           <div className="space-y-6">
             <Field>
               <FieldLabel htmlFor="email">Email Address</FieldLabel>
-              <Input id="email" name="email" type="email" required />
+              <Input id="email" name="email" type="email" />
             </Field>
 
             <Field>
