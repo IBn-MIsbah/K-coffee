@@ -15,11 +15,13 @@ import {
   Minus,
 } from "lucide-react";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import MenuItemSkeleton from "@/components/menu/MenuItemsSkeloton";
 import Image from "next/image";
 import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
+import { useCart } from "@/lib/store/useCart";
+import { useSession } from "@/lib/auth-client";
 
 interface ProductWithCategory extends Product {
   category?: {
@@ -31,10 +33,15 @@ interface ProductWithCategory extends Product {
 export default function ProductDetailPage() {
   const { productId } = useParams();
   const router = useRouter();
+  const pathname = usePathname();
   const [product, setProduct] = useState<ProductWithCategory | null>(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [addingToCart, setAddingToCart] = useState(false);
+
+  const { addItem } = useCart();
+  const { data } = useSession();
+  const session = data?.session;
 
   useEffect(() => {
     if (!productId) return;
@@ -63,11 +70,18 @@ export default function ProductDetailPage() {
 
   const handleAddToCart = async () => {
     if (!product) return;
-
+    if (!session) {
+      router.push(`/login?callbackUrl=${encodeURIComponent(pathname)}`);
+      return;
+    }
     setAddingToCart(true);
     try {
-      // TODO: Implement cart API call
-      await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate API call
+      addItem({
+        productId: product.id,
+        name: product.name,
+        price: parseFloat(product.price as any),
+        quantity: quantity,
+      });
 
       toast.success(`Added ${quantity} ${product.name} to cart`, {
         description: `Total: $${((product.price as any) * quantity).toFixed(
