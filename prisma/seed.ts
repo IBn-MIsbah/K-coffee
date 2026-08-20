@@ -1,6 +1,7 @@
 import prisma from "@/lib/prisma";
 import { initializePermissions, UserRole } from "@/lib/rbac";
 import { auth } from "@/lib/auth";
+import { hashPassword } from "better-auth/crypto";
 
 async function seed() {
   console.log("Seeding database...");
@@ -27,6 +28,7 @@ async function seed() {
   for (const userData of initialUsers) {
     const existing = await prisma.user.findUnique({
       where: { email: userData.email },
+      include: { accounts: true },
     });
 
     if (!existing) {
@@ -39,15 +41,35 @@ async function seed() {
         },
       });
 
-      await prisma.user.update({
-        where: { email: userData.email },
+      console.log(`${userData.name} created.`);
+    } else if (
+      !existing.accounts.some(
+        (account) => account.providerId === "credential"
+      )
+    ) {
+      // Recover a user left incomplete by an earlier failed seed. This keeps
+      // the seed idempotent and creates the same credential account Better
+      // Auth creates during email sign-up.
+      await prisma.account.create({
         data: {
-          role: userData.role,
-          emailVerified: true,
+          id: crypto.randomUUID(),
+          issuer: "local:credential",
+          accountId: existing.id,
+          providerId: "credential",
+          userId: existing.id,
+          password: await hashPassword(userData.password),
         },
       });
-      console.log(`${userData.name} created.`);
+      console.log(`${userData.name}'s credential account was restored.`);
     }
+
+    await prisma.user.update({
+      where: { email: userData.email },
+      data: {
+        role: userData.role,
+        emailVerified: true,
+      },
+    });
   }
 
   // 2. Product Seeding
