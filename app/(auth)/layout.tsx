@@ -16,7 +16,7 @@ export default async function AuthLayout({
     redirect("/dashboard");
   }
   return (
-    <div className="flex min-h-screen bg-white">
+    <div className="flex min-h-screen w-full min-w-0 flex-1 bg-white">
       {/* Left side - Brand/Content */}
       <div className="hidden lg:flex lg:w-1/2 bg-linear-to-br from-amber-600 to-amber-700 p-12">
         <div className="flex flex-col justify-center max-w-md mx-auto text-white">

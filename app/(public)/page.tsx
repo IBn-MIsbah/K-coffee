@@ -19,9 +19,9 @@ export default async function Home() {
       {/* Hero Section */}
       <section className="relative bg-[url(/img/Hero3.png)] min-h-[500px] sm:min-h-[600px] md:min-h-[700px] lg:min-h-[800px] bg-no-repeat bg-cover bg-center">
         {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-linear-to-r from-black/70 via-black/50 to-transparent"></div>
+        <div className="absolute inset-0 bg-linear-to-r from-black/85 via-black/75 to-black/70"></div>
 
-        <div className="relative z-10 flex flex-col justify-center h-full p-6 sm:p-10 md:p-16 lg:px-28 lg:py-20">
+        <div className="relative z-10 flex h-full flex-col justify-center px-6 pb-6 pt-28 sm:px-10 sm:pb-10 sm:pt-32 md:px-16 md:pb-16 md:pt-36 lg:px-28 lg:pb-20 lg:pt-40">
           {/* Logo/Brand Name */}
           <div className="flex items-center gap-3 mb-6 sm:mb-8 md:mb-10">
             <CoffeeIcon className="h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14 text-amber-300" />
@@ -51,15 +51,18 @@ export default async function Home() {
 
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 mt-6 sm:mt-8">
-              <Button className="rounded-full bg-amber-400 hover:bg-amber-500 text-amber-950 font-bold px-8 sm:px-10 py-3 sm:py-4 text-base sm:text-lg md:text-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
-                <Coffee className="w-5 h-5 sm:w-6 sm:h-6 mr-2" />
-                <Link href={"/dashboard"}>Order Online </Link>
+              <Button asChild className="rounded-full bg-amber-400 hover:bg-amber-500 text-amber-950 font-bold px-8 sm:px-10 py-3 sm:py-4 text-base sm:text-lg md:text-xl transition-[transform,box-shadow,background-color] duration-200 ease-out hover:scale-105 shadow-lg hover:shadow-xl motion-reduce:transform-none motion-reduce:transition-none">
+                <Link href="/dashboard">
+                  <Coffee aria-hidden="true" className="w-5 h-5 sm:w-6 sm:h-6" />
+                  Order Online
+                </Link>
               </Button>
               <Button
-                variant="outline"
-                className="rounded-full border-2 border-amber-400 text-amber-400 hover:bg-amber-400/10 font-bold px-8 sm:px-10 py-3 sm:py-4 text-base sm:text-lg md:text-xl transition-all duration-300 transform hover:scale-105"
+                asChild
+                variant="ghost"
+                className="rounded-full border-2 border-amber-400 bg-transparent text-amber-100 hover:bg-amber-400/15 hover:text-amber-50 font-bold px-8 sm:px-10 py-3 sm:py-4 text-base sm:text-lg md:text-xl transition-[transform,background-color] duration-200 ease-out hover:scale-105 motion-reduce:transform-none motion-reduce:transition-none"
               >
-                <Link href={"/menu"}>View Our Menu</Link>
+                <Link href="/menu">View Our Menu</Link>
               </Button>
             </div>
           </div>
@@ -112,9 +115,10 @@ export default async function Home() {
           <div className="text-center mt-12 sm:mt-16 md:mt-20">
             <Button
               variant="outline"
-              className="rounded-full border-2 border-amber-600 text-amber-600 hover:bg-amber-600 hover:text-amber-50 px-8 sm:px-10 py-3 sm:py-4 text-base sm:text-lg font-semibold transition-all duration-300"
+              asChild
+              className="rounded-full border-2 border-amber-800 text-amber-800 hover:bg-amber-800 hover:text-amber-50 px-8 sm:px-10 py-3 sm:py-4 text-base sm:text-lg font-semibold transition-[background-color,color] duration-200 ease-out motion-reduce:transition-none"
             >
-              <Link href={"/menu"}>View Full Menu </Link>
+              <Link href="/menu">View Full Menu</Link>
             </Button>
           </div>
         </div>
@@ -175,14 +179,18 @@ export default async function Home() {
           </p>
 
           <div className="flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-6 md:gap-8">
-            <Button className="rounded-full font-bold bg-amber-400 hover:bg-amber-500 text-amber-950 px-10 sm:px-12 py-4 sm:py-5 text-lg sm:text-xl md:text-2xl transition-all duration-300 transform hover:scale-105 shadow-2xl hover:shadow-3xl">
-              <Coffee className="w-6 h-6 sm:w-7 sm:h-7 mr-3" />
-              <Link href={"/dashboard"}>Order Online </Link>
+            <Button asChild className="rounded-full font-bold bg-amber-400 hover:bg-amber-500 text-amber-950 px-10 sm:px-12 py-4 sm:py-5 text-lg sm:text-xl md:text-2xl transition-[transform,box-shadow,background-color] duration-200 ease-out hover:scale-105 shadow-2xl hover:shadow-3xl motion-reduce:transform-none motion-reduce:transition-none">
+              <Link href="/dashboard">
+                <Coffee aria-hidden="true" className="w-6 h-6 sm:w-7 sm:h-7" />
+                Order Online
+              </Link>
             </Button>
 
-            <Button className="rounded-full font-bold bg-transparent border-2 border-amber-400 text-amber-400 hover:bg-amber-400/10 px-10 sm:px-12 py-4 sm:py-5 text-lg sm:text-xl md:text-2xl transition-all duration-300 transform hover:scale-105">
-              <MapPin className="w-6 h-6 sm:w-7 sm:h-7 mr-3" />
-              Visit Us Today
+            <Button asChild variant="ghost" className="rounded-full font-bold border-2 border-amber-400 bg-transparent text-amber-100 hover:bg-amber-400/15 hover:text-amber-50 px-10 sm:px-12 py-4 sm:py-5 text-lg sm:text-xl md:text-2xl transition-[transform,background-color] duration-200 ease-out hover:scale-105 motion-reduce:transform-none motion-reduce:transition-none">
+              <Link href="/locations">
+                <MapPin aria-hidden="true" className="w-6 h-6 sm:w-7 sm:h-7" />
+                Visit Us Today
+              </Link>
             </Button>
           </div>
 

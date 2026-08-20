@@ -38,16 +38,16 @@ const Header = () => {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-in-out flex justify-center ${
+      className={`fixed top-0 left-0 right-0 z-50 flex justify-center transition-[transform,opacity,background-color,box-shadow] duration-300 ease-out motion-reduce:transition-none ${
         isScrolled ? "pt-4 px-4" : "pt-0 px-0"
       }`}
     >
       <nav
-        className={`transition-all duration-500 ease-in-out flex justify-between items-center px-4 md:px-12
+        className={`flex w-full items-center justify-between px-4 transition-[transform,opacity,background-color,box-shadow] duration-300 ease-out motion-reduce:transition-none md:justify-center
         ${
           isScrolled
-            ? "w-[600px] max-w-5xl bg-black/60 backdrop-blur-md rounded-4xl border border-white/10 shadow-2xl p-4"
-            : "w-full bg-linear-to-b from-black.70 to-transparent p-6"
+            ? "max-w-[600px] rounded-3xl border border-white/10 bg-black/60 py-3 shadow-2xl backdrop-blur-md"
+            : "bg-linear-to-b from-black/70 to-transparent py-6"
         }
         `}
       >
@@ -66,7 +66,7 @@ const Header = () => {
           {Items.map((item) => (
             <Link
               key={item.label}
-              className="font-medium tracking-wide hover:text-amber-400 transition duration-300 ease-in-out hover:scale-105 text-base lg:text-lg"
+              className="text-base font-medium tracking-wide transition-[transform,color] duration-200 ease-out hover:scale-105 hover:text-amber-400 motion-reduce:transform-none motion-reduce:transition-none lg:text-lg"
               href={item.url}
             >
               {item.label}
@@ -80,7 +80,8 @@ const Header = () => {
           <div className="hidden sm:flex md:hidden items-center space-x-4 mr-2">
             <Link
               href="/menu"
-              className="text-amber-100 hover:text-amber-400 transition"
+              aria-label="View menu"
+              className="text-amber-100 transition-colors duration-200 hover:text-amber-400 motion-reduce:transition-none"
             >
               <List className="w-6 h-6" />
             </Link>
@@ -89,7 +90,11 @@ const Header = () => {
           {/* THE BURGER MENU (Visible on Mobile & Tablet) */}
           <button
             onClick={toggleSidebar}
-            className="md:hidden bg-amber-600 hover:bg-amber-700 text-amber-100 p-2 rounded-lg transition duration-300 flex items-center space-x-2"
+            type="button"
+            aria-label={isOpen ? "Close navigation menu" : "Open navigation menu"}
+            aria-controls="mobile-navigation"
+            aria-expanded={isOpen}
+            className="flex items-center space-x-2 rounded-lg bg-amber-600 p-2 text-amber-100 transition-colors duration-200 hover:bg-amber-700 motion-reduce:transition-none md:hidden"
           >
             <span className="hidden sm:inline text-sm font-bold px-1">
               MENU
@@ -101,7 +106,10 @@ const Header = () => {
 
       {/* --- SIDEBAR LOGIC --- */}
       <aside
-        className={`fixed top-0 right-0 h-full w-full sm:w-80 bg-linear-to-b from-amber-900 to-amber-950 shadow-2xl transform transition-transform duration-300 ease-in-out z-[60] ${
+        id="mobile-navigation"
+        aria-hidden={!isOpen}
+        inert={!isOpen}
+        className={`fixed top-0 right-0 z-[60] h-full w-full transform bg-linear-to-b from-amber-900 to-amber-950 shadow-2xl transition-transform duration-300 ease-out motion-reduce:transition-none sm:w-80 ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
@@ -117,7 +125,9 @@ const Header = () => {
             </div>
             <button
               onClick={toggleSidebar}
-              className="bg-amber-800 hover:bg-amber-700 text-amber-100 p-2 rounded-lg transition"
+              type="button"
+              aria-label="Close navigation menu"
+              className="rounded-lg bg-amber-800 p-2 text-amber-100 transition-colors duration-200 hover:bg-amber-700 motion-reduce:transition-none"
             >
               <X className="w-6 h-6" />
             </button>
@@ -132,7 +142,7 @@ const Header = () => {
                     <Link
                       href={item.url}
                       onClick={toggleSidebar}
-                      className="flex items-center gap-4 text-amber-100 text-lg font-semibold hover:text-amber-300 p-4 rounded-xl hover:bg-white/10 transition-all"
+                      className="flex items-center gap-4 rounded-xl p-4 text-lg font-semibold text-amber-100 transition-colors duration-200 hover:bg-white/10 hover:text-amber-300 motion-reduce:transition-none"
                     >
                       <IconComponent className="w-5 h-5 text-amber-500" />
                       <span>{item.label}</span>
@@ -144,11 +154,13 @@ const Header = () => {
           </div>
 
           <div className="mt-auto pt-6 border-t border-amber-800/50">
-            <Link href="/cart" onClick={toggleSidebar}>
-              <button className="w-full bg-amber-500 hover:bg-amber-400 text-amber-950 font-bold py-4 rounded-xl transition flex items-center justify-center space-x-2">
+            <Link
+              href="/cart"
+              onClick={toggleSidebar}
+              className="flex w-full items-center justify-center space-x-2 rounded-xl bg-amber-500 py-4 font-bold text-amber-950 transition-colors duration-200 hover:bg-amber-400 motion-reduce:transition-none"
+            >
                 <ShoppingCart className="w-5 h-5" />
                 <span>View Cart (0)</span>
-              </button>
             </Link>
           </div>
         </div>
@@ -156,9 +168,11 @@ const Header = () => {
 
       {/* Overlay */}
       {isOpen && (
-        <div
+        <button
           onClick={toggleSidebar}
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+          type="button"
+          aria-label="Close navigation menu"
+          className="fixed inset-0 z-50 cursor-default bg-black/60 backdrop-blur-sm"
         />
       )}
     </header>

@@ -2,6 +2,7 @@ import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import prisma from "@/lib/prisma";
 import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
 import Link from "next/link";
+import MotionCard from "./MotionCard";
 
 // const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 const PopularItemsCard = async () => {
@@ -15,13 +16,11 @@ const PopularItemsCard = async () => {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-8 md:gap-10">
       {products.map((p, index) => (
-        <Link href={`/menu/${p.id}`} key={index}>
-          <Card
-            className="max-w-sm h-full flex flex-col items-center text-center 
-                 bg-white rounded-xl p-6 shadow-lg hover:shadow-2xl 
-                 transition-all duration-300 ease-in-out transform hover:-translate-y-1 
-                 border border-amber-100"
-          >
+        <Link href={`/menu/${p.id}`} key={p.id} className="block h-full rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-700 focus-visible:ring-offset-2">
+          <MotionCard index={index}>
+            <Card
+              className="max-w-sm h-full flex flex-col items-center text-center bg-white rounded-xl p-6 shadow-lg hover:shadow-2xl transition-shadow duration-200 ease-out motion-reduce:transition-none border border-amber-100"
+            >
             <Avatar className="flex justify-center items-center mb-6">
               {p.imageUrl ? (
                 <AvatarImage
@@ -48,7 +47,8 @@ const PopularItemsCard = async () => {
                 {p.description}
               </CardDescription>
             )}
-          </Card>
+            </Card>
+          </MotionCard>
         </Link>
       ))}
     </div>

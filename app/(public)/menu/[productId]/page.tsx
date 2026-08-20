@@ -185,22 +185,22 @@ export default function ProductDetailPage() {
             </div>
 
             {/* Features */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex items-center gap-3 p-3 bg-amber-50 rounded-lg">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div className="flex min-w-0 items-center gap-3 rounded-lg bg-amber-50 p-3">
                 <Thermometer className="w-5 h-5 text-amber-600" />
-                <span className="text-sm text-gray-700">Hot/Iced Options</span>
+                <span className="min-w-0 break-words text-sm text-gray-700">Hot/Iced Options</span>
               </div>
-              <div className="flex items-center gap-3 p-3 bg-amber-50 rounded-lg">
+              <div className="flex min-w-0 items-center gap-3 rounded-lg bg-amber-50 p-3">
                 <Clock className="w-5 h-5 text-amber-600" />
-                <span className="text-sm text-gray-700">Ready in 5 min</span>
+                <span className="min-w-0 break-words text-sm text-gray-700">Ready in 5 min</span>
               </div>
-              <div className="flex items-center gap-3 p-3 bg-amber-50 rounded-lg">
+              <div className="flex min-w-0 items-center gap-3 rounded-lg bg-amber-50 p-3">
                 <Leaf className="w-5 h-5 text-amber-600" />
-                <span className="text-sm text-gray-700">Fresh Ingredients</span>
+                <span className="min-w-0 break-words text-sm text-gray-700">Fresh Ingredients</span>
               </div>
-              <div className="flex items-center gap-3 p-3 bg-amber-50 rounded-lg">
+              <div className="flex min-w-0 items-center gap-3 rounded-lg bg-amber-50 p-3">
                 <Coffee className="w-5 h-5 text-amber-600" />
-                <span className="text-sm text-gray-700">Arabica Beans</span>
+                <span className="min-w-0 break-words text-sm text-gray-700">Arabica Beans</span>
               </div>
             </div>
 
@@ -210,9 +210,9 @@ export default function ProductDetailPage() {
                 Customize Your Order
               </h3>
               <div className="space-y-3">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <span className="text-gray-700">Size</span>
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
                     {["Small", "Medium", "Large"].map((size) => (
                       <button
                         key={size}
@@ -223,9 +223,9 @@ export default function ProductDetailPage() {
                     ))}
                   </div>
                 </div>
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <span className="text-gray-700">Sweetness</span>
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
                     {["Less", "Normal", "Extra"].map((level) => (
                       <button
                         key={level}
@@ -379,13 +379,13 @@ function RelatedProducts({
         You Might Also Like
       </h2>
       {loading ? (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
           {[1, 2, 3, 4].map((i) => (
             <MenuItemSkeleton key={i} />
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
           {relatedProducts.map((product) => (
             <Link
               key={product.id}
@@ -408,7 +408,7 @@ function RelatedProducts({
                     <Coffee className="w-12 h-12 text-amber-400" />
                   </div>
                 )}
-                <h3 className="font-semibold text-gray-900 truncate">
+                <h3 className="truncate font-semibold text-gray-900" title={product.name}>
                   {product.name}
                 </h3>
                 <p className="text-amber-700 font-bold">
