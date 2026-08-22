@@ -12,10 +12,12 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { getCartItemCount, useCart } from "@/lib/store/useCart";
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isScrolled, setIsScrolled] = useState<boolean>(false);
+  const cartItemCount = useCart((state) => getCartItemCount(state.items));
 
   useEffect(() => {
     const handleScroll = () => {
@@ -76,6 +78,10 @@ const Header = () => {
 
         {/* 3. TABLET & MOBILE CONTROLS (Right Side) */}
         <div className="flex items-center space-x-4 ml-auto md:ml-0">
+          <Link href="/cart" aria-label={`View cart, ${cartItemCount} ${cartItemCount === 1 ? "item" : "items"}`} className="relative grid size-11 place-items-center rounded-full text-amber-100 transition-colors hover:bg-white/10 hover:text-amber-300">
+            <ShoppingCart aria-hidden="true" className="size-5" />
+            {cartItemCount > 0 && <span className="absolute -right-1 -top-1 grid min-w-5 place-items-center rounded-full bg-amber-400 px-1 text-xs font-bold leading-5 text-amber-950">{cartItemCount > 99 ? "99+" : cartItemCount}</span>}
+          </Link>
           {/* Tablet Icons (Visible only on sm to md) */}
           <div className="hidden sm:flex md:hidden items-center space-x-4 mr-2">
             <Link
@@ -160,7 +166,7 @@ const Header = () => {
               className="flex w-full items-center justify-center space-x-2 rounded-xl bg-amber-500 py-4 font-bold text-amber-950 transition-colors duration-200 hover:bg-amber-400 motion-reduce:transition-none"
             >
                 <ShoppingCart className="w-5 h-5" />
-                <span>View Cart (0)</span>
+                <span>View Cart ({cartItemCount})</span>
             </Link>
           </div>
         </div>
