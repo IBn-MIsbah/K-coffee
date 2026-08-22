@@ -14,9 +14,9 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(cuid())
+  id            String   @id @default(cuid())
   name          String?
-  email         String?   @unique
+  email         String?  @unique
   emailVerified Boolean?
   phone         String?
   image         String?
@@ -58,20 +58,30 @@ model Category {
 }
 
 model Order {
-  id          String        @id @default(cuid())
-  user        User?         @relation(fields: [userId], references: [id])
-  userId      String?
-  orderNumber String        @unique
-  items       OrderItem[]
-  totalAmount Decimal       @db.Decimal(10, 2)
-  status      OrderStatus   @default(PENDING)
-  store       StoreLocation @relation(fields: [storeId], references: [id])
-  storeId     String
-  pickupTime  DateTime? // For pre-orders
-  createdAt   DateTime      @default(now())
+  id             String        @id @default(cuid())
+  user           User?         @relation(fields: [userId], references: [id])
+  userId         String?
+  orderNumber    String        @unique
+  items          OrderItem[]
+  totalAmount    Decimal       @db.Decimal(10, 2)
+  subtotalAmount Decimal       @default(0) @db.Decimal(10, 2)
+  taxAmount      Decimal       @default(0) @db.Decimal(10, 2)
+  currency       String        @default("ETB")
+  paymentMethod  PaymentMethod @default(PAY_AT_PICKUP)
+  paymentStatus  PaymentStatus @default(PENDING)
+  status         OrderStatus   @default(PENDING)
+  store          StoreLocation @relation(fields: [storeId], references: [id])
+  storeId        String
+  pickupTime     DateTime? // For pre-orders
+  notes          String?
+  idempotencyKey String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
 
+  @@unique([userId, idempotencyKey])
   @@index([userId])
   @@index([status])
+  @@index([storeId, status, pickupTime])
 }
 
 model OrderItem {
@@ -101,15 +111,19 @@ model Reservation {
 }
 
 model StoreLocation {
-  id           String        @id @default(cuid())
-  name         String
-  address      String
-  phone        String
-  hours        Json // Opening hours by day
-  coordinates  String? // For maps integration
-  isActive     Boolean       @default(true)
-  orders       Order[]
-  reservations Reservation[]
+  id                    String        @id @default(cuid())
+  name                  String
+  address               String
+  phone                 String
+  hours                 Json // Opening hours by day
+  timezone              String        @default("Africa/Addis_Ababa")
+  pickupIntervalMinutes Int           @default(20)
+  pickupLeadTimeMinutes Int           @default(20)
+  pickupCapacity        Int           @default(10)
+  coordinates           String? // For maps integration
+  isActive              Boolean       @default(true)
+  orders                Order[]
+  reservations          Reservation[]
 }
 
 enum OrderStatus {
@@ -119,6 +133,16 @@ enum OrderStatus {
   READY_FOR_PICKUP
   COMPLETED
   CANCELLED
+}
+
+enum PaymentMethod {
+  PAY_AT_PICKUP
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  VOID
 }
 
 enum ReservationStatus {
@@ -169,8 +193,8 @@ model Account {
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
 
-  @@index([userId])
   @@unique([issuer, accountId])
+  @@index([userId])
   @@map("account")
 }
 

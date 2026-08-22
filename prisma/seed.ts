@@ -73,6 +73,35 @@ async function seed() {
   }
 
   // 2. Product Seeding
+  await prisma.storeLocation.upsert({
+    where: { id: "k-coffee-addis-ababa" },
+    update: {
+      timezone: "Africa/Addis_Ababa",
+      pickupIntervalMinutes: 20,
+      pickupLeadTimeMinutes: 20,
+      pickupCapacity: 10,
+    },
+    create: {
+      id: "k-coffee-addis-ababa",
+      name: "K-Coffee Addis Ababa",
+      address: "Addis Ababa, Ethiopia",
+      phone: "+251-000-000-000",
+      timezone: "Africa/Addis_Ababa",
+      pickupIntervalMinutes: 20,
+      pickupLeadTimeMinutes: 20,
+      pickupCapacity: 10,
+      hours: {
+        mon: { open: "07:00", close: "19:00" },
+        tue: { open: "07:00", close: "19:00" },
+        wed: { open: "07:00", close: "19:00" },
+        thu: { open: "07:00", close: "19:00" },
+        fri: { open: "07:00", close: "19:00" },
+        sat: { open: "07:00", close: "19:00" },
+        sun: { open: "07:00", close: "19:00" },
+      },
+    },
+  });
+
   const products = [
     { name: "Espresso", category: "Coffee", price: 3.5 },
     { name: "Green Tea", category: "Tea", price: 3.0 },

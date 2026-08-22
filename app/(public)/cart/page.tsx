@@ -5,7 +5,7 @@ import { getCartItemCount, getCartSubtotal, useCart } from "@/lib/store/useCart"
 import { Coffee, Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
 import Link from "next/link";
 
-const formatMoney = (amount: number) => `$${amount.toFixed(2)}`;
+const formatMoney = (amount: number) => `ETB ${amount.toFixed(2)}`;
 
 export default function CartPage() {
   const items = useCart((state) => state.items);
@@ -30,7 +30,7 @@ export default function CartPage() {
 
         {items.length === 0 ? (
           <section className="grid min-h-80 place-items-center rounded-3xl border border-[#ead9bf] bg-[#fffaf0] p-8 text-center shadow-[0_18px_45px_rgba(88,49,22,.08)]">
-            <div><span className="mx-auto grid size-14 place-items-center rounded-full bg-[#f5dfba] text-[#9b5828]"><Coffee aria-hidden="true" className="size-7" /></span><h2 className="mt-5 text-2xl font-bold text-[#3b2116]">Your cart is empty</h2><p className="mx-auto mt-2 max-w-md text-[#725b4c]">Choose something you&apos;ll enjoy. You can review quantities here before checkout is available.</p><Button asChild className="mt-6 min-h-12 rounded-full bg-[#b56527] px-6 font-bold text-white hover:bg-[#934817]"><Link href="/menu"><ShoppingBag aria-hidden="true" className="size-4" /> Browse the menu</Link></Button></div>
+            <div><span className="mx-auto grid size-14 place-items-center rounded-full bg-[#f5dfba] text-[#9b5828]"><Coffee aria-hidden="true" className="size-7" /></span><h2 className="mt-5 text-2xl font-bold text-[#3b2116]">Your cart is empty</h2><p className="mx-auto mt-2 max-w-md text-[#725b4c]">Choose something you&apos;ll enjoy, then select a pickup time at checkout.</p><Button asChild className="mt-6 min-h-12 rounded-full bg-[#b56527] px-6 font-bold text-white hover:bg-[#934817]"><Link href="/menu"><ShoppingBag aria-hidden="true" className="size-4" /> Browse the menu</Link></Button></div>
           </section>
         ) : (
           <div className="grid gap-7 lg:grid-cols-[minmax(0,1fr)_20rem]">
@@ -49,7 +49,7 @@ export default function CartPage() {
                 ))}
               </ul>
             </section>
-            <aside className="h-fit rounded-3xl bg-[#3b2116] p-6 text-[#fff9ee] shadow-[0_18px_45px_rgba(60,32,17,.2)]"><h2 className="text-lg font-bold">Order summary</h2><div className="mt-5 flex items-center justify-between border-b border-white/15 pb-4 text-[#f7dfbc]"><span>Subtotal</span><span className="font-semibold tabular-nums">{formatMoney(subtotal)}</span></div><p className="mt-4 text-sm leading-5 text-[#e9ca9e]">Taxes, pickup availability, and final total are confirmed at checkout.</p><Button disabled className="mt-6 min-h-12 w-full rounded-full bg-[#f4bd4d] font-bold text-[#30170b] disabled:opacity-70">Checkout setup in progress</Button><Button asChild variant="ghost" className="mt-2 min-h-11 w-full text-[#fff9ee] hover:bg-white/10 hover:text-white"><Link href="/menu">Add more items</Link></Button></aside>
+            <aside className="h-fit rounded-3xl bg-[#3b2116] p-6 text-[#fff9ee] shadow-[0_18px_45px_rgba(60,32,17,.2)]"><h2 className="text-lg font-bold">Order summary</h2><div className="mt-5 flex items-center justify-between border-b border-white/15 pb-4 text-[#f7dfbc]"><span>Subtotal</span><span className="font-semibold tabular-nums">{formatMoney(subtotal)}</span></div><p className="mt-4 text-sm leading-5 text-[#e9ca9e]">A 15% VAT and your 20-minute pickup slot are confirmed at checkout. Payment is at pickup.</p><Button asChild className="mt-6 min-h-12 w-full rounded-full bg-[#f4bd4d] font-bold text-[#30170b] hover:bg-[#ffd36f]"><Link href="/checkout">Continue to checkout</Link></Button><Button asChild variant="ghost" className="mt-2 min-h-11 w-full text-[#fff9ee] hover:bg-white/10 hover:text-white"><Link href="/menu">Add more items</Link></Button></aside>
           </div>
         )}
       </div>
