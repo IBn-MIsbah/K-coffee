@@ -15,13 +15,12 @@ import {
   Minus,
 } from "lucide-react";
 import Link from "next/link";
-import { useParams, usePathname, useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import MenuItemSkeleton from "@/components/menu/MenuItemsSkeloton";
 import Image from "next/image";
 import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
 import { useCart } from "@/lib/store/useCart";
-import { useSession } from "@/lib/auth-client";
 
 interface ProductWithCategory extends Product {
   category?: {
@@ -33,15 +32,10 @@ interface ProductWithCategory extends Product {
 export default function ProductDetailPage() {
   const { productId } = useParams();
   const router = useRouter();
-  const pathname = usePathname();
   const [product, setProduct] = useState<ProductWithCategory | null>(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
-  const [addingToCart, setAddingToCart] = useState(false);
-
   const { addItem } = useCart();
-  const { data } = useSession();
-  const session = data?.session;
 
   useEffect(() => {
     if (!productId) return;
@@ -68,36 +62,14 @@ export default function ProductDetailPage() {
     fetchProduct();
   }, [productId, router]);
 
-  const handleAddToCart = async () => {
+  const handleAddToCart = () => {
     if (!product) return;
-    if (!session) {
-      router.push(`/login?callbackUrl=${encodeURIComponent(pathname)}`);
-      return;
-    }
-    setAddingToCart(true);
-    try {
-      addItem({
-        productId: product.id,
-        name: product.name,
-        price: parseFloat(product.price as any),
-        quantity: quantity,
-      });
-
-      toast.success(`Added ${quantity} ${product.name} to cart`, {
-        description: `Total: $${((product.price as any) * quantity).toFixed(
-          2
-        )}`,
-        action: {
-          label: "View Cart",
-          onClick: () => router.push("/cart"),
-        },
-      });
-    } catch (error) {
-      console.log(error);
-      toast.error("Failed to add item to cart");
-    } finally {
-      setAddingToCart(false);
-    }
+    const price = Number(product.price);
+    addItem({ productId: product.id, name: product.name, price, imageUrl: product.imageUrl }, quantity);
+    toast.success(`Added ${quantity} ${product.name} to your cart`, {
+      description: `Total: $${(price * quantity).toFixed(2)}`,
+      action: { label: "View cart", onClick: () => router.push("/cart") },
+    });
   };
 
   if (loading) {
@@ -204,41 +176,6 @@ export default function ProductDetailPage() {
               </div>
             </div>
 
-            {/* Customization (Optional) */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-900">
-                Customize Your Order
-              </h3>
-              <div className="space-y-3">
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <span className="text-gray-700">Size</span>
-                  <div className="flex flex-wrap gap-2">
-                    {["Small", "Medium", "Large"].map((size) => (
-                      <button
-                        key={size}
-                        className="px-4 py-2 border border-amber-300 rounded-lg hover:bg-amber-50 transition-colors"
-                      >
-                        {size}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <span className="text-gray-700">Sweetness</span>
-                  <div className="flex flex-wrap gap-2">
-                    {["Less", "Normal", "Extra"].map((level) => (
-                      <button
-                        key={level}
-                        className="px-4 py-2 border border-amber-300 rounded-lg hover:bg-amber-50 transition-colors"
-                      >
-                        {level}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-
             {/* Quantity & Add to Cart */}
             <div className="space-y-4 pt-4 border-t">
               <div className="flex items-center justify-between">
@@ -247,6 +184,7 @@ export default function ProductDetailPage() {
                   <div className="flex items-center gap-3">
                     <button
                       onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                      aria-label="Decrease quantity"
                       className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center hover:bg-amber-200 transition-colors"
                     >
                       <Minus className="w-4 h-4" />
@@ -255,7 +193,8 @@ export default function ProductDetailPage() {
                       {quantity}
                     </span>
                     <button
-                      onClick={() => setQuantity((q) => q + 1)}
+                      onClick={() => setQuantity((q) => Math.min(99, q + 1))}
+                      aria-label="Increase quantity"
                       className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center hover:bg-amber-200 transition-colors"
                     >
                       <Plus className="w-4 h-4" />
@@ -276,12 +215,11 @@ export default function ProductDetailPage() {
 
               <Button
                 onClick={handleAddToCart}
-                disabled={addingToCart}
                 className="w-full py-6 text-lg font-bold bg-amber-600 hover:bg-amber-700 text-white"
                 size="lg"
               >
                 <ShoppingCart className="w-5 h-5 mr-2" />
-                {addingToCart ? "Adding to Cart..." : "Add to Cart"}
+                Add to Cart
               </Button>
             </div>
           </div>

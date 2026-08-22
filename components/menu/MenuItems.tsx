@@ -1,108 +1,52 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
-import { Button } from "../ui/button";
-import { Card, CardDescription, CardTitle } from "../ui/card";
+"use client";
+
+import { Button } from "@/components/ui/button";
+import { Card, CardDescription, CardTitle } from "@/components/ui/card";
+import { useCart } from "@/lib/store/useCart";
+import { Coffee, Plus } from "lucide-react";
 import Link from "next/link";
+import { toast } from "sonner";
 
 interface MenuItemsProps {
   id: string;
   name: string;
   description?: string | null;
   imageUrl: string | null;
-  price: any;
-  onAddToCart?: () => void;
+  price: number;
 }
-const MenuItems = ({
-  id,
-  name,
-  description,
-  price,
-  imageUrl,
-  onAddToCart,
-}: MenuItemsProps) => {
-  const formatPrice = (price: any): string => {
-    if (typeof price === "number") {
-      return price.toFixed(2);
-    }
-    if (typeof price === "string") {
-      const num = parseFloat(price);
-      return isNaN(num) ? "0.00" : num.toFixed(2);
-    }
-    return "0.00";
+
+const MenuItems = ({ id, name, description, price, imageUrl }: MenuItemsProps) => {
+  const addItem = useCart((state) => state.addItem);
+
+  const addToCart = () => {
+    addItem({ productId: id, name, price, imageUrl });
+    toast.success(`${name} added to your cart`, {
+      description: `$${price.toFixed(2)}`,
+      action: { label: "View cart", onClick: () => window.location.assign("/cart") },
+    });
   };
 
-  const formattedPrice = formatPrice(price);
   return (
-    <Link href={`/menu/${id}`} className="block group">
-      <Card className="group p-5 border-0 bg-amber-100 hover:bg-amber-50 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-        {/* Image with fallback */}
-        <div className="relative overflow-hidden rounded-lg mb-4">
+    <Card className="group flex h-full flex-col border-0 bg-amber-100 p-5 transition-[box-shadow,transform] duration-300 hover:-translate-y-1 hover:bg-amber-50 hover:shadow-xl motion-reduce:transform-none motion-reduce:transition-none">
+      <Link href={`/menu/${id}`} className="block rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-700 focus-visible:ring-offset-2">
+        <div className="relative mb-4 aspect-[4/3] overflow-hidden rounded-lg bg-amber-200/50">
           {imageUrl ? (
-            <Avatar className="w-full">
-              <AvatarImage
-                className="h-64 w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                src={imageUrl}
-                alt={name}
-              />
-            </Avatar>
+            // eslint-disable-next-line @next/next/no-img-element
+            <img className="size-full object-cover transition-transform duration-500 group-hover:scale-105 motion-reduce:transition-none" src={imageUrl} alt={name} />
           ) : (
-            <div className="h-64 w-full bg-amber-200/50 flex items-center justify-center rounded-lg">
-              <span className="text-5xl text-amber-700/30">☕</span>
-            </div>
+            <div className="grid size-full place-items-center text-amber-700/60"><Coffee aria-hidden="true" className="size-12" /></div>
           )}
         </div>
-
-        {/* Content */}
-        <div className="space-y-3 grow">
-          <CardTitle className="text-2xl font-bold text-amber-950 line-clamp-1">
-            {name}
-          </CardTitle>
-
-          {description && (
-            <CardDescription className="text-gray-600 line-clamp-2 min-h-10">
-              {description}
-            </CardDescription>
-          )}
-
-          <div className="flex items-center justify-between pt-2">
-            <span className="font-bold text-2xl text-amber-900">
-              ${formattedPrice}
-            </span>
-
-            {/* Optional: Add quantity selector later */}
-            {/* <div className="flex items-center gap-2">
-            <Button variant="outline" size="icon" className="h-8 w-8">-</Button>
-            <span className="w-8 text-center">1</span>
-            <Button variant="outline" size="icon" className="h-8 w-8">+</Button>
-          </div> */}
-          </div>
+        <div className="grow space-y-3">
+          <CardTitle className="line-clamp-1 text-2xl font-bold text-amber-950">{name}</CardTitle>
+          {description && <CardDescription className="min-h-10 line-clamp-2 text-gray-600">{description}</CardDescription>}
+          <p className="pt-2 text-2xl font-bold text-amber-900">${price.toFixed(2)}</p>
         </div>
-
-        {/* Action Button */}
-        <Button
-          onClick={onAddToCart}
-          className="w-full mt-4 bg-amber-600 hover:bg-amber-700 text-amber-50 font-semibold text-lg py-6 transition-all duration-300 hover:scale-[1.02] active:scale-95"
-          size="lg"
-        >
-          <span className="flex items-center gap-2">
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-              />
-            </svg>
-            Add to Cart
-          </span>
-        </Button>
-      </Card>
-    </Link>
+      </Link>
+      <Button onClick={addToCart} className="mt-4 min-h-12 w-full bg-amber-600 py-3 text-base font-semibold text-amber-50 hover:bg-amber-700" size="lg">
+        <Plus aria-hidden="true" className="size-5" /> Add to cart
+      </Button>
+    </Card>
   );
 };
 

@@ -152,16 +152,7 @@ export default function MenuPage() {
                     name={product.name}
                     imageUrl={product.imageUrl}
                     description={product.description}
-                    price={product.price}
-                    onAddToCart={() => {
-                      toast.success(`Added ${product.name} to cart`, {
-                        description: `$${product.price.toFixed(2)}`,
-                        action: {
-                          label: "View Cart",
-                          onClick: () => console.log("Go to cart"),
-                        },
-                      });
-                    }}
+                    price={parseDecimal(product.price)}
                   />
                 ))}
               </div>
