@@ -4,6 +4,12 @@ import { auth } from "@/lib/auth";
 import { hashPassword } from "better-auth/crypto";
 
 async function seed() {
+  if (process.env.DEPLOY_ENV === "production" || process.env.NODE_ENV === "production") {
+    throw new Error(
+      "The development seed is blocked in production. Use `npm run seed:production` with approved production configuration instead."
+    );
+  }
+
   console.log("Seeding database...");
 
   // Initialize RBAC permissions
