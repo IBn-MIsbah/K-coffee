@@ -1,6 +1,5 @@
 import AppSidebar from "@/components/DashboardGrouped/AppSidebar";
-import { Breadcrumb } from "@/components/ui/breadcrumb";
-import { SidebarTrigger } from "@/components/ui/sidebar";
+import DashboardHeader from "@/components/DashboardGrouped/DashboardHeader";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 
@@ -16,15 +15,12 @@ export default async function EditorsDashboard({
   const userRole = session?.user?.role;
 
   return (
-    <div className="flex min-h-screen min-w-full">
+    <div className="flex min-h-dvh min-w-full bg-[#f7f1e6]">
       {/* Pass the role to the sidebar */}
-      <AppSidebar role={userRole} />
-      <div className="flex flex-1 flex-col">
-        <header className="flex h-16 items-center gap-4 border-b px-6">
-          <SidebarTrigger />
-          <Breadcrumb />
-        </header>
-        <main className="flex-1 p-6">{children}</main>
+      <AppSidebar role={userRole} name={session?.user?.name} />
+      <div className="flex min-w-0 flex-1 flex-col">
+        <DashboardHeader />
+        <main className="flex-1 p-4 sm:p-6 lg:p-8">{children}</main>
       </div>
     </div>
   );

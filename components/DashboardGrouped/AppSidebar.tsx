@@ -1,121 +1,144 @@
 "use client";
 import {
+  ClipboardList,
   Coffee,
   IdCardLanyard,
-  LucideLayoutDashboard,
-  Settings,
-  UsersRound,
+  LayoutDashboard,
+  UserRound,
   UtensilsCrossed,
 } from "lucide-react";
 import {
   Sidebar,
+  SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
 } from "../ui/sidebar";
+import { LogoutButton } from "@/components/LogoutButton";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-
-interface AppSidebarProps {
-  role: string | null | undefined;
-}
-
-const items = [
+type Item = {
+  title: string;
+  url: string;
+  icon: typeof UserRound;
+  roles: string[];
+  exact?: boolean;
+};
+const work: Item[] = [
   {
-    title: "Dashboard",
-    url: "/dashboard",
-    icon: LucideLayoutDashboard,
-    roles: ["SUPERADMIN", "ADMIN", "CASHIER"], // Optional: Role-based access
+    title: "Admin overview",
+    url: "/dashboard/admin",
+    icon: LayoutDashboard,
+    roles: ["SUPERADMIN", "ADMIN"],
+    exact: true,
   },
   {
-    title: "Order",
-    url: "/order",
+    title: "Profile",
+    url: "/dashboard/profile",
+    icon: UserRound,
+    roles: ["SUPERADMIN", "ADMIN", "CASHIER", "USER"],
+    exact: true,
+  },
+  {
+    title: "Pickup queue",
+    url: "/dashboard/cashier",
     icon: UtensilsCrossed,
     roles: ["SUPERADMIN", "ADMIN", "CASHIER"],
+    exact: true,
   },
+];
+const admin: Item[] = [
   {
-    title: "Customers",
-    url: "/customers",
-    icon: UsersRound,
-    roles: ["SUPERADMIN", "ADMIN"],
-  },
-  {
-    title: "Staff",
-    url: "/staff",
+    title: "Staff access",
+    url: "/dashboard/admin/staff",
     icon: IdCardLanyard,
     roles: ["SUPERADMIN"],
   },
   {
-    title: "Settings",
-    url: "/settings",
-    icon: Settings,
-    roles: ["SUPERADMIN", "ADMIN"],
+    title: "Audit log",
+    url: "/dashboard/admin/audit",
+    icon: ClipboardList,
+    roles: ["SUPERADMIN"],
   },
 ];
-
-const AppSidebar = ({ role }: AppSidebarProps) => {
-  const pathname = usePathname();
-
-  // Helper to check if item is active
-  const isActive = (url: string) => {
-    if (url === "/dashboard/admin") {
-      return pathname === "/dashboard";
-    }
-    // For nested routes, check if pathname starts with the URL
-    return pathname.startsWith(url);
-  };
-
-  // Filter items based on user role (optional)
-  const filteredItems = items.filter((item) => {
-    if (!role) return false;
-    return item.roles.includes(role);
-  });
-
+export default function AppSidebar({
+  role,
+  name,
+}: {
+  role: string | null | undefined;
+  name?: string | null;
+}) {
+  const path = usePathname();
+  const visible = (items: Item[]) =>
+    items.filter((i) => role && i.roles.includes(role));
+  const menu = (items: Item[]) => (
+    <SidebarMenu>
+      {visible(items).map((i) => (
+        <SidebarMenuItem key={i.url}>
+          <SidebarMenuButton
+            asChild
+            isActive={i.exact ? path === i.url : path.startsWith(i.url)}
+            tooltip={i.title}
+            className="min-h-11 text-[#725b4c] hover:bg-[#f5dfba] hover:text-[#3b2116] data-[active=true]:bg-[#f5dfba] data-[active=true]:font-bold data-[active=true]:text-[#7d4018]"
+          >
+            <Link href={i.url}>
+              <i.icon aria-hidden="true" className="size-4" />
+              <span>{i.title}</span>
+            </Link>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      ))}
+    </SidebarMenu>
+  );
   return (
-    <Sidebar className="py-4 pl-4">
-      <SidebarHeader className="flex flex-row items-center font-extrabold">
-        <span className="w-12 h-12 flex justify-center items-center rounded-full">
-          <Coffee className="text-amber-600" />
-        </span>
-        <div className="flex flex-col">
-          <span className="text-2xl text-amber-950/90">K-Coffee</span>
-          <span className="text-sm font-semibold text-amber-950/90">
-            Management console
+    <Sidebar className="border-r border-[#ead9bf] bg-[#fffaf0] p-3">
+      <SidebarHeader className="rounded-2xl bg-[#3b2116] p-4 text-[#fff9ee]">
+        <div className="flex items-center gap-3">
+          <span className="grid size-10 place-items-center rounded-xl bg-[#f4bd4d] text-[#3b2116]">
+            <Coffee aria-hidden="true" className="size-5" />
           </span>
+          <div>
+            <p className="font-extrabold">K-Coffee</p>
+            <p className="text-xs text-[#e9ca9e]">Management console</p>
+          </div>
         </div>
       </SidebarHeader>
-      <SidebarGroup>
-        <SidebarGroupContent>
-          <SidebarMenu>
-            {filteredItems.map((item) => {
-              const active = isActive(item.url);
-              return (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    asChild
-                    className={`transition-all duration-200 ${
-                      active
-                        ? "text-amber-600 border-l-4 border-amber-600 bg-amber-600/10 font-semibold"
-                        : "text-gray-600 hover:text-amber-600 hover:bg-amber-600/5"
-                    }`}
-                    isActive={active}
-                  >
-                    <Link href={item.url}>
-                      <item.icon className={active ? "text-amber-600" : ""} />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              );
-            })}
-          </SidebarMenu>
-        </SidebarGroupContent>
-      </SidebarGroup>
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupLabel>Workspace</SidebarGroupLabel>
+          <SidebarGroupContent>{menu(work)}</SidebarGroupContent>
+        </SidebarGroup>
+        {visible(admin).length > 0 && (
+          <SidebarGroup>
+            <SidebarGroupLabel>Administration</SidebarGroupLabel>
+            <SidebarGroupContent>{menu(admin)}</SidebarGroupContent>
+          </SidebarGroup>
+        )}
+      </SidebarContent>
+      <SidebarFooter className="rounded-2xl border border-[#ead9bf] bg-white p-3">
+        <Link
+          href="/dashboard/profile"
+          className="mb-2 flex min-h-11 items-center gap-3 rounded-xl px-2 hover:bg-[#f7f1e6]"
+        >
+          <span className="grid size-9 place-items-center rounded-full bg-[#f5dfba] font-bold text-[#7d4018]">
+            {(name ?? "K").slice(0, 1).toUpperCase()}
+          </span>
+          <span className="min-w-0">
+            <span className="block truncate text-sm font-bold text-[#3b2116]">
+              {name ?? "K-Coffee account"}
+            </span>
+            <span className="block text-xs text-[#725b4c]">
+              {role?.replaceAll("_", " ")}
+            </span>
+          </span>
+        </Link>
+        <LogoutButton className="min-h-11 w-full justify-start text-[#7e271d] hover:bg-red-50 hover:text-[#7e271d]" />
+      </SidebarFooter>
     </Sidebar>
   );
-};
-
-export default AppSidebar;
+}

@@ -6,6 +6,6 @@ export default async function DashboardRedirect() {
 
   if (role === "ADMIN" || role === "SUPERADMIN") redirect("/dashboard/admin");
   if (role === "CASHIER") redirect("/dashboard/cashier");
-  if (role === "USER") redirect("/dashboard/user");
+  if (role === "USER") redirect("/dashboard/profile");
   redirect("/unauthorized");
 }
