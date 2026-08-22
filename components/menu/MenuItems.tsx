@@ -5,6 +5,7 @@ import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { useCart } from "@/lib/store/useCart";
 import { Coffee, Plus } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 interface MenuItemsProps {
@@ -17,12 +18,13 @@ interface MenuItemsProps {
 
 const MenuItems = ({ id, name, description, price, imageUrl }: MenuItemsProps) => {
   const addItem = useCart((state) => state.addItem);
+  const router = useRouter();
 
   const addToCart = () => {
     addItem({ productId: id, name, price, imageUrl });
     toast.success(`${name} added to your cart`, {
       description: `$${price.toFixed(2)}`,
-      action: { label: "View cart", onClick: () => window.location.assign("/cart") },
+      action: { label: "View cart", onClick: () => router.push("/cart") },
     });
   };
 
