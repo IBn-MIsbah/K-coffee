@@ -11,6 +11,7 @@
     "prisma:studio": "prisma studio",
     "prisma:generate": "prisma generate",
     "prisma:format": "prisma format",
+    "permissions:sync": "tsx scripts/sync-permissions.ts",
     "prisma:migrate": "prisma migrate dev",
     "db:seed": "prisma db seed",
     "db:reset": "prisma migrate reset && npm run db:seed",

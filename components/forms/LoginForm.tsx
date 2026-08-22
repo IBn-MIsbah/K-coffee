@@ -3,7 +3,7 @@
 import { Coffee, Eye, EyeClosed } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "@/lib/auth-client"; // Use the client library
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -15,6 +15,12 @@ const LoginForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const requestedReturnTo = searchParams.get("returnTo");
+  const returnTo =
+    requestedReturnTo?.startsWith("/") && !requestedReturnTo.startsWith("//")
+      ? requestedReturnTo
+      : "/dashboard";
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -30,7 +36,7 @@ const LoginForm = () => {
       const result = await signIn.email({
         email,
         password,
-        callbackURL: "/dashboard",
+        callbackURL: returnTo,
       });
 
       if (result.error) {
@@ -46,7 +52,7 @@ const LoginForm = () => {
           duration: 3000,
         });
         setTimeout(() => {
-          router.push("/dashboard");
+          router.push(returnTo);
           router.refresh();
         }, 500);
       }
@@ -78,11 +84,11 @@ const LoginForm = () => {
             <p className="text-gray-500">Sign in to your account</p>
           </div>
 
-          {/* {error && (
-            <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+          {error && (
+            <div className="p-3 bg-red-50 border border-red-200 rounded-lg" role="alert">
               <p className="text-red-600 text-sm font-medium">{error}</p>
             </div>
-          )} */}
+          )}
 
           <div className="space-y-6">
             <Field>
@@ -103,6 +109,7 @@ const LoginForm = () => {
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? (
                     <EyeClosed className="h-5 w-5" />

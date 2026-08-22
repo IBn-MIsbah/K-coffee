@@ -1,14 +1,11 @@
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
+import { requirePageSession } from "@/lib/authz";
 import { redirect } from "next/navigation";
 
 export default async function DashboardRedirect() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-  const role = session?.user.role;
+  const { role } = await requirePageSession("/dashboard");
 
   if (role === "ADMIN" || role === "SUPERADMIN") redirect("/dashboard/admin");
   if (role === "CASHIER") redirect("/dashboard/cashier");
-  redirect("/dashboard/user");
+  if (role === "USER") redirect("/dashboard/user");
+  redirect("/unauthorized");
 }
