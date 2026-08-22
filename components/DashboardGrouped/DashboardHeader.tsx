@@ -5,6 +5,7 @@ const labels: Record<string, string> = {
   "/dashboard/admin": "Admin overview",
   "/dashboard/cashier": "Pickup queue",
   "/dashboard/profile": "Profile",
+  "/dashboard/orders": "My orders",
   "/dashboard/admin/staff": "Staff access",
   "/dashboard/admin/audit": "Audit log",
 };

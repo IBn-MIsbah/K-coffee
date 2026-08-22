@@ -4,6 +4,7 @@ import {
   Coffee,
   IdCardLanyard,
   LayoutDashboard,
+  ReceiptText,
   UserRound,
   UtensilsCrossed,
 } from "lucide-react";
@@ -30,6 +31,13 @@ type Item = {
   exact?: boolean;
 };
 const work: Item[] = [
+  {
+    title: "My orders",
+    url: "/dashboard/orders",
+    icon: ReceiptText,
+    roles: ["SUPERADMIN", "ADMIN", "CASHIER", "USER"],
+    exact: true,
+  },
   {
     title: "Admin overview",
     url: "/dashboard/admin",
