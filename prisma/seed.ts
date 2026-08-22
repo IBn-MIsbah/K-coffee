@@ -102,6 +102,9 @@ async function seed() {
     },
   });
 
+  const cashier = await prisma.user.findUnique({ where: { email: "cashier@coffeeshop.com" } });
+  if (cashier) await prisma.staffStoreAssignment.upsert({ where: { userId_storeId: { userId: cashier.id, storeId: "k-coffee-addis-ababa" } }, update: {}, create: { userId: cashier.id, storeId: "k-coffee-addis-ababa" } });
+
   const products = [
     { name: "Espresso", category: "Coffee", price: 3.5 },
     { name: "Green Tea", category: "Tea", price: 3.0 },

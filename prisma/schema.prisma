@@ -29,9 +29,10 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  sessions  Session[]
-  accounts  Account[]
-  auditLogs AuditLog[]
+  sessions    Session[]
+  accounts    Account[]
+  auditLogs   AuditLog[]
+  staffStores StaffStoreAssignment[]
 
   @@map("user")
 }
@@ -111,19 +112,32 @@ model Reservation {
 }
 
 model StoreLocation {
-  id                    String        @id @default(cuid())
+  id                    String                 @id @default(cuid())
   name                  String
   address               String
   phone                 String
   hours                 Json // Opening hours by day
-  timezone              String        @default("Africa/Addis_Ababa")
-  pickupIntervalMinutes Int           @default(20)
-  pickupLeadTimeMinutes Int           @default(20)
-  pickupCapacity        Int           @default(10)
+  timezone              String                 @default("Africa/Addis_Ababa")
+  pickupIntervalMinutes Int                    @default(20)
+  pickupLeadTimeMinutes Int                    @default(20)
+  pickupCapacity        Int                    @default(10)
   coordinates           String? // For maps integration
-  isActive              Boolean       @default(true)
+  isActive              Boolean                @default(true)
   orders                Order[]
   reservations          Reservation[]
+  staffAssignments      StaffStoreAssignment[]
+}
+
+model StaffStoreAssignment {
+  id        String        @id @default(cuid())
+  userId    String
+  storeId   String
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  store     StoreLocation @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  createdAt DateTime      @default(now())
+
+  @@unique([userId, storeId])
+  @@index([storeId])
 }
 
 enum OrderStatus {
