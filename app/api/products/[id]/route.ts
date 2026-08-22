@@ -7,8 +7,8 @@ export const GET = async (
 ) => {
   try {
     const { id } = await params;
-    const product = await prisma.product.findUnique({
-      where: { id: id, isActive: true },
+    const product = await prisma.product.findFirst({
+      where: { id, isActive: true },
       include: { category: { select: { name: true, slug: true } } },
     });
 

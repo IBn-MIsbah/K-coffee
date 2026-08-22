@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -7,7 +6,11 @@ export const GET = async (req: NextRequest) => {
   const categoryFilter = searchParams.get("category");
   const nameFilter = searchParams.get("name");
 
-  const whereClause: any = {};
+  const whereClause: {
+    isActive: boolean;
+    category?: { name: { contains: string; mode: "insensitive" } };
+    name?: { contains: string; mode: "insensitive" };
+  } = { isActive: true };
 
   if (categoryFilter) {
     whereClause.category = {
