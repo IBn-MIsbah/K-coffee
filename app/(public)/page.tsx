@@ -1,221 +1,149 @@
 import PopularItemsCard from "@/components/Home/componenets/PopularItemsCard";
 import { PopularItemsCardSkeleton } from "@/components/Home/skeloton/PopularItemsCardSkeloton";
 import { Button } from "@/components/ui/button";
-import {
-  Coffee,
-  Coffee as CoffeeIcon,
-  Clock,
-  MapPin,
-  Phone,
-} from "lucide-react";
+import { ArrowRight, Coffee, MapPin, Quote, Star } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
 
 export const dynamic = "force-dynamic";
 
-export default async function Home() {
+export default function Home() {
   return (
-    <>
-      {/* Hero Section */}
-      <section className="relative bg-[url(/img/Hero3.png)] min-h-[500px] sm:min-h-[600px] md:min-h-[700px] lg:min-h-[800px] bg-no-repeat bg-cover bg-center">
-        {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-linear-to-r from-black/85 via-black/75 to-black/70"></div>
-
-        <div className="relative z-10 flex h-full flex-col justify-center px-6 pb-6 pt-28 sm:px-10 sm:pb-10 sm:pt-32 md:px-16 md:pb-16 md:pt-36 lg:px-28 lg:pb-20 lg:pt-40">
-          {/* Logo/Brand Name */}
-          <div className="flex items-center gap-3 mb-6 sm:mb-8 md:mb-10">
-            <CoffeeIcon className="h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14 text-amber-300" />
-            <div className="flex flex-col font-bold">
-              <span className="text-xl sm:text-2xl md:text-3xl lg:text-4xl text-amber-100">
-                K-COFFEE
+    <div className="overflow-hidden bg-[#f7f1e6] text-[#20130e]">
+      <section className="relative isolate min-h-[650px] overflow-hidden bg-[#1e120e] sm:min-h-[720px]">
+        <div className="absolute inset-0 bg-[url('/img/Hero-image.jpg')] bg-cover bg-center" />
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(20,11,8,.94)_0%,rgba(25,13,9,.76)_46%,rgba(25,13,9,.28)_100%)]" />
+        <div className="absolute inset-x-0 bottom-0 h-40 bg-linear-to-t from-[#1d110d] to-transparent" />
+        <div className="relative mx-auto flex min-h-[650px] max-w-7xl items-center px-5 pb-16 pt-32 sm:min-h-[720px] sm:px-8 lg:px-12">
+          <div className="max-w-xl">
+            <div className="mb-7 flex items-center gap-3 text-[#fff7e9]">
+              <span className="grid size-11 place-items-center rounded-full border border-[#f6d38a]/60 bg-[#f4bd4d] text-[#32160b] shadow-lg">
+                <Coffee aria-hidden="true" className="size-5" />
               </span>
-              <span className="text-xl sm:text-2xl md:text-3xl lg:text-4xl text-amber-100">
-                SHOP
+              <span className="text-sm font-extrabold tracking-[.13em]">
+                K-COFFEE SHOP
               </span>
             </div>
-          </div>
-
-          {/* Slogans and Tagline */}
-          <div className="flex flex-col space-y-4 sm:space-y-6 md:space-y-8 max-w-2xl lg:max-w-3xl">
-            <h1 className="font-extrabold text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl leading-tight text-amber-50">
-              Brewed for You,
-              <span className="block text-amber-300">Daily.</span>
-            </h1>
-            <h2 className="font-bold text-2xl sm:text-3xl md:text-4xl lg:text-5xl leading-tight text-amber-300">
-              Experience the Difference.
-            </h2>
-            <p className="text-base sm:text-lg md:text-xl text-amber-100 max-w-xl">
-              Crafted with passion, served with a smile. Every cup tells a
-              story.
+            <p className="mb-4 text-xs font-bold uppercase tracking-[.24em] text-[#f6c664]">
+              Freshly roasted · locally loved
             </p>
-
-            {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 mt-6 sm:mt-8">
-              <Button asChild className="rounded-full bg-amber-400 hover:bg-amber-500 text-amber-950 font-bold px-8 sm:px-10 py-3 sm:py-4 text-base sm:text-lg md:text-xl transition-[transform,box-shadow,background-color] duration-200 ease-out hover:scale-105 shadow-lg hover:shadow-xl motion-reduce:transform-none motion-reduce:transition-none">
-                <Link href="/dashboard">
-                  <Coffee aria-hidden="true" className="w-5 h-5 sm:w-6 sm:h-6" />
-                  Order Online
+            <h1 className="max-w-lg text-balance text-4xl font-extrabold leading-[1.03] tracking-[-.045em] text-[#fff9ee] sm:text-5xl lg:text-6xl">
+              Brewed for You, Daily.{" "}
+              <span className="text-[#f6c664]">Experience the Difference.</span>
+            </h1>
+            <p className="mt-6 max-w-md text-base leading-7 text-[#f8ead2] sm:text-lg">
+              Crafted with passion, served with a smile. Discover coffee made to
+              slow you down and brighten your day.
+            </p>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <Button
+                asChild
+                className="h-12 rounded-full bg-[#f4bd4d] px-6 font-bold text-[#30170b] shadow-[0_12px_35px_rgba(0,0,0,.24)] hover:bg-[#ffd26f]"
+              >
+                <Link href="/menu">
+                  Order online{" "}
+                  <ArrowRight aria-hidden="true" className="size-4" />
                 </Link>
               </Button>
               <Button
                 asChild
-                variant="ghost"
-                className="rounded-full border-2 border-amber-400 bg-transparent text-amber-100 hover:bg-amber-400/15 hover:text-amber-50 font-bold px-8 sm:px-10 py-3 sm:py-4 text-base sm:text-lg md:text-xl transition-[transform,background-color] duration-200 ease-out hover:scale-105 motion-reduce:transform-none motion-reduce:transition-none"
+                variant="outline"
+                className="h-12 rounded-full border-[#f8ead2]/60 bg-transparent px-6 font-bold text-[#fff9ee] hover:bg-white/10 hover:text-white"
               >
-                <Link href="/menu">View Our Menu</Link>
+                <Link href="/locations">Visit our shop</Link>
               </Button>
             </div>
           </div>
         </div>
       </section>
-      {/* Quick Info Bar - Mobile */}
-      <div className="md:hidden bg-amber-800 py-4 px-6">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <Clock className="w-5 h-5 text-amber-300" />
-            <div>
-              <p className="text-amber-100 text-sm font-medium">
-                Open 7AM-10PM
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <Phone className="w-5 h-5 text-amber-300" />
-            <div>
-              <p className="text-amber-100 text-sm font-medium">
-                (555) 123-4567
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
 
-      {/* Popular Items Section */}
-      <section className="py-12 sm:py-16 md:py-20 lg:py-24 px-4 sm:px-6 md:px-8 lg:px-12 bg-linear-to-b from-stone-50 to-stone-100">
-        <div className="max-w-7xl mx-auto">
-          {/* Section Header */}
-          <div className="text-center mb-12 sm:mb-16 md:mb-20">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-serif font-extrabold text-amber-950 mb-4 tracking-wider">
-              POPULAR MENU ITEMS
-            </h2>
-            <p className="text-stone-600 text-base sm:text-lg md:text-xl max-w-2xl mx-auto px-4">
-              Discover our most loved creations, crafted with the finest
-              ingredients
-            </p>
-            <div className="w-24 h-1 bg-amber-600 mx-auto mt-6 rounded-full"></div>
-          </div>
-
-          {/* Products Grid */}
-
-          <Suspense fallback={<PopularItemsCardSkeleton />}>
-            <PopularItemsCard />
-          </Suspense>
-
-          {/* View More Button */}
-          <div className="text-center mt-12 sm:mt-16 md:mt-20">
-            <Button
-              variant="outline"
-              asChild
-              className="rounded-full border-2 border-amber-800 text-amber-800 hover:bg-amber-800 hover:text-amber-50 px-8 sm:px-10 py-3 sm:py-4 text-base sm:text-lg font-semibold transition-[background-color,color] duration-200 ease-out motion-reduce:transition-none"
-            >
-              <Link href="/menu">View Full Menu</Link>
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonial/Featured Section */}
-      <section className="py-16 sm:py-20 md:py-24 px-4 sm:px-6 md:px-8 lg:px-12 bg-amber-800/10">
-        <div className="max-w-6xl mx-auto">
-          <div className="bg-linear-to-r from-amber-900 to-amber-800 rounded-3xl p-8 sm:p-10 md:p-12 lg:p-16 shadow-2xl">
-            <div className="flex flex-col lg:flex-row items-center gap-8 md:gap-12">
-              <div className="lg:w-1/2">
-                <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold text-amber-50 mb-4">
-                  Artisan Coffee Experience
-                </h3>
-                <p className="text-amber-100 text-base sm:text-lg md:text-xl mb-6">
-                  Each bean is carefully sourced from sustainable farms and
-                  roasted to perfection in our local facility. Our baristas are
-                  trained to bring out the unique flavors in every cup.
+      <section className="mx-auto max-w-7xl px-5 py-16 sm:px-8 lg:px-12 lg:py-24">
+        <div className="grid gap-16 lg:grid-cols-[1.45fr_.9fr] lg:gap-20">
+          <div>
+            <div className="mb-9 flex items-end justify-between gap-5">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[.22em] text-[#a56328]">
+                  Made with care
                 </p>
-                <ul className="space-y-3">
-                  {[
-                    "Single-Origin Beans",
-                    "Handcrafted Brews",
-                    "Sustainable Sourcing",
-                    "Expert Baristas",
-                  ].map((item) => (
-                    <li
-                      key={item}
-                      className="flex items-center gap-3 text-amber-100"
-                    >
-                      <div className="w-2 h-2 bg-amber-300 rounded-full"></div>
-                      {item}
-                    </li>
-                  ))}
-                </ul>
+                <h2 className="mt-3 text-3xl font-extrabold tracking-[-.035em] text-[#2c1911] sm:text-4xl">
+                  Popular menu items
+                </h2>
               </div>
-              <div className="lg:w-1/2">
-                <div className="bg-stone-900 rounded-2xl p-6 shadow-inner">
-                  <div className="aspect-video bg-stone-800 rounded-lg flex items-center justify-center">
-                    <Coffee className="w-20 h-20 text-amber-600 opacity-50" />
-                  </div>
-                </div>
-              </div>
+              <Link
+                href="/menu"
+                className="hidden items-center gap-1 text-sm font-bold text-[#8d4d20] underline-offset-4 hover:underline sm:flex"
+              >
+                Full menu <ArrowRight aria-hidden="true" className="size-4" />
+              </Link>
             </div>
+            <Suspense fallback={<PopularItemsCardSkeleton />}>
+              <PopularItemsCard />
+            </Suspense>
+            <Link
+              href="/menu"
+              className="mt-8 inline-flex items-center gap-1 text-sm font-bold text-[#8d4d20] underline-offset-4 hover:underline sm:hidden"
+            >
+              Browse the full menu{" "}
+              <ArrowRight aria-hidden="true" className="size-4" />
+            </Link>
           </div>
+          <aside className="self-center rounded-[1.75rem] border border-[#ead9bf] bg-[#fffaf0] p-7 shadow-[0_18px_45px_rgba(88,49,22,.10)] sm:p-9">
+            <Quote aria-hidden="true" className="size-8 text-[#d78b35]" />
+            <p className="mt-5 text-xl font-semibold leading-8 tracking-[-.02em] text-[#432519]">
+              “This isn&apos;t just a coffee shop — it&apos;s the calmest part
+              of my morning.”
+            </p>
+            <div
+              className="mt-7 flex items-center gap-1 text-[#e5a137]"
+              aria-label="Five star review"
+            >
+              {Array.from({ length: 5 }, (_, index) => (
+                <Star
+                  key={index}
+                  aria-hidden="true"
+                  className="size-4 fill-current"
+                />
+              ))}
+            </div>
+            <div className="mt-5 border-t border-[#ead9bf] pt-5">
+              <p className="font-bold text-[#442619]">Sara A.</p>
+              <p className="mt-1 text-sm text-[#7b604e]">Regular since 2021</p>
+            </div>
+          </aside>
         </div>
       </section>
 
-      {/* Call to Action Section */}
-      <section className="bg-linear-to-br from-amber-800 via-amber-900 to-amber-950 py-16 sm:py-20 md:py-24 px-4 sm:px-6">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="font-extrabold text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-amber-50 mb-6 sm:mb-8 leading-tight">
-            Ready for Your Perfect Cup?
-          </h2>
-          <p className="text-amber-200 text-lg sm:text-xl md:text-2xl mb-10 sm:mb-12 max-w-2xl mx-auto">
-            Join thousands of coffee lovers who start their day with our special
-            brews
+      <section className="bg-[#b56527] px-5 py-16 text-center text-[#fff9ee] sm:px-8 lg:py-20">
+        <div className="mx-auto max-w-3xl">
+          <p className="text-xs font-bold uppercase tracking-[.22em] text-[#ffe0a1]">
+            Call to action
           </p>
-
-          <div className="flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-6 md:gap-8">
-            <Button asChild className="rounded-full font-bold bg-amber-400 hover:bg-amber-500 text-amber-950 px-10 sm:px-12 py-4 sm:py-5 text-lg sm:text-xl md:text-2xl transition-[transform,box-shadow,background-color] duration-200 ease-out hover:scale-105 shadow-2xl hover:shadow-3xl motion-reduce:transform-none motion-reduce:transition-none">
-              <Link href="/dashboard">
-                <Coffee aria-hidden="true" className="w-6 h-6 sm:w-7 sm:h-7" />
-                Order Online
-              </Link>
+          <h2 className="mt-3 text-balance text-3xl font-extrabold tracking-[-.04em] sm:text-5xl">
+            Ready for your coffee?
+          </h2>
+          <p className="mx-auto mt-4 max-w-xl text-[#fff0d5]">
+            Order your favourites ahead or step inside for a warm welcome and a
+            perfectly made cup.
+          </p>
+          <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+            <Button
+              asChild
+              className="h-11 rounded-full bg-[#fff8e9] px-6 font-bold text-[#8a431a] hover:bg-white"
+            >
+              <Link href="/menu">Order online</Link>
             </Button>
-
-            <Button asChild variant="ghost" className="rounded-full font-bold border-2 border-amber-400 bg-transparent text-amber-100 hover:bg-amber-400/15 hover:text-amber-50 px-10 sm:px-12 py-4 sm:py-5 text-lg sm:text-xl md:text-2xl transition-[transform,background-color] duration-200 ease-out hover:scale-105 motion-reduce:transform-none motion-reduce:transition-none">
+            <Button
+              asChild
+              variant="outline"
+              className="h-11 rounded-full border-[#fff0d5]/70 bg-transparent px-6 font-bold text-white hover:bg-white/10 hover:text-white"
+            >
               <Link href="/locations">
-                <MapPin aria-hidden="true" className="w-6 h-6 sm:w-7 sm:h-7" />
-                Visit Us Today
+                <MapPin aria-hidden="true" className="size-4" /> Find a location
               </Link>
             </Button>
-          </div>
-
-          {/* Stats Section */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-8 mt-16 sm:mt-20 md:mt-24">
-            {[
-              { value: "10K+", label: "Happy Customers" },
-              { value: "50+", label: "Coffee Varieties" },
-              { value: "5", label: "Locations" },
-              { value: "15", label: "Years Serving" },
-            ].map((stat, index) => (
-              <div key={index} className="text-center">
-                <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-amber-300 mb-2">
-                  {stat.value}
-                </div>
-                <div className="text-amber-100 text-sm sm:text-base">
-                  {stat.label}
-                </div>
-              </div>
-            ))}
           </div>
         </div>
       </section>
-
-      {/* Footer Section */}
-    </>
+    </div>
   );
 }
