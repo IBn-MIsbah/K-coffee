@@ -2,9 +2,11 @@
 import {
   ClipboardList,
   Coffee,
+  FolderCog,
   IdCardLanyard,
   LayoutDashboard,
   ReceiptText,
+  Store,
   UserRound,
   UtensilsCrossed,
 } from "lucide-react";
@@ -61,6 +63,18 @@ const work: Item[] = [
   },
 ];
 const admin: Item[] = [
+  {
+    title: "Catalogue",
+    url: "/dashboard/admin/catalogue",
+    icon: FolderCog,
+    roles: ["SUPERADMIN", "ADMIN"],
+  },
+  {
+    title: "Stores",
+    url: "/dashboard/admin/stores",
+    icon: Store,
+    roles: ["SUPERADMIN", "ADMIN"],
+  },
   {
     title: "Staff access",
     url: "/dashboard/admin/staff",

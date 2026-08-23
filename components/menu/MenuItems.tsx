@@ -39,7 +39,7 @@ const MenuItems = ({
       return;
     }
     if (role === "ADMIN" || role === "SUPERADMIN") {
-      router.push("/admin/dashboard");
+      router.push("/dashboard/admin");
       return;
     }
     if (role !== "USER") {
@@ -95,7 +95,7 @@ const MenuItems = ({
             </CardDescription>
           )}
           <p className="pt-2 text-2xl font-bold text-amber-900">
-            ${price.toFixed(2)}
+            ETB {price.toFixed(2)}
           </p>
         </div>
       </Link>

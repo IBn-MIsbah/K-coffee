@@ -76,7 +76,7 @@ export default function ProductDetailPage() {
       return;
     }
     if (role === "ADMIN" || role === "SUPERADMIN") {
-      router.push("/admin/dashboard");
+      router.push("/dashboard/admin");
       return;
     }
     if (role !== "USER") {
@@ -167,7 +167,7 @@ export default function ProductDetailPage() {
                 {product.name}
               </h1>
               <p className="text-2xl md:text-3xl font-bold text-amber-700">
-                $
+                ETB{" "}
                 {typeof product.price === "number"
                   ? (product.price as any).toFixed(2)
                   : product.price}
