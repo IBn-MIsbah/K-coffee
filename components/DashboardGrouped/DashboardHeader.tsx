@@ -3,6 +3,7 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { usePathname } from "next/navigation";
 const labels: Record<string, string> = {
   "/dashboard/admin": "Admin overview",
+  "/dashboard/admin/orders": "Order operations",
   "/dashboard/cashier": "Pickup queue",
   "/dashboard/profile": "Profile",
   "/dashboard/orders": "My orders",

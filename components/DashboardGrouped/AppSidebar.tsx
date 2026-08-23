@@ -37,7 +37,7 @@ const work: Item[] = [
     title: "My orders",
     url: "/dashboard/orders",
     icon: ReceiptText,
-    roles: ["SUPERADMIN", "ADMIN", "CASHIER", "USER"],
+    roles: ["USER"],
     exact: true,
   },
   {
@@ -46,6 +46,12 @@ const work: Item[] = [
     icon: LayoutDashboard,
     roles: ["SUPERADMIN", "ADMIN"],
     exact: true,
+  },
+  {
+    title: "Order operations",
+    url: "/dashboard/admin/orders",
+    icon: ReceiptText,
+    roles: ["SUPERADMIN", "ADMIN"],
   },
   {
     title: "Profile",
