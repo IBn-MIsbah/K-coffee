@@ -56,7 +56,7 @@ export const auth = betterAuth({
     updateAge: 60 * 60 * 24,
   },
   rateLimit: {
-    enabled: true,
+    enabled: process.env.E2E_TEST_MODE !== "true",
     window: 60,
     max: 60,
     customRules: {

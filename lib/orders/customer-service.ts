@@ -1,11 +1,14 @@
 import "server-only";
 import { type AuthenticatedActor, AuthorizationError } from "@/lib/authz";
 import { canCancelOrder } from "@/lib/order-policy";
+import { customerOrderHistoryStatuses, type CustomerOrderHistoryFilters } from "@/lib/orders/customer-order-validation";
 import prisma from "@/lib/prisma";
+import { UserRole } from "@/lib/rbac";
 
-export async function listCustomerOrders(actor: AuthenticatedActor) {
+export async function listCustomerOrders(actor: AuthenticatedActor, filters: CustomerOrderHistoryFilters) {
+  if (actor.role !== UserRole.USER) throw new AuthorizationError();
   return prisma.order.findMany({
-    where: { userId: actor.id },
+    where: { userId: actor.id, ...(customerOrderHistoryStatuses[filters.view] ? { status: { in: customerOrderHistoryStatuses[filters.view] } } : {}) },
     orderBy: { createdAt: "desc" },
     take: 50,
     include: {
@@ -18,6 +21,7 @@ export async function getCustomerOrder(
   actor: AuthenticatedActor,
   orderId: string,
 ) {
+  if (actor.role !== UserRole.USER) throw new AuthorizationError();
   return prisma.order.findFirst({
     where: { id: orderId, userId: actor.id },
     include: {
@@ -36,6 +40,7 @@ export async function cancelCustomerOrder(
   actor: AuthenticatedActor,
   orderId: string,
 ) {
+  if (actor.role !== UserRole.USER) throw new AuthorizationError();
   return prisma.$transaction(async (tx) => {
     const order = await tx.order.findFirst({
       where: { id: orderId, userId: actor.id },

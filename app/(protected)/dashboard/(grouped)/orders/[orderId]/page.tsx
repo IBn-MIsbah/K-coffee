@@ -1,5 +1,7 @@
-import { requireActor } from "@/lib/authz";
-import { getCustomerOrder } from "@/lib/orders/customer-service";
+import { requirePageRole } from "@/lib/authz";
+import { canCustomerCancel, getCustomerOrder } from "@/lib/orders/customer-service";
+import CustomerOrderCancelButton from "@/components/orders/CustomerOrderCancelButton";
+import { UserRole } from "@/lib/rbac";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 const steps = [
@@ -22,11 +24,12 @@ export default async function CustomerOrderPage({
 }: {
   params: Promise<{ orderId: string }>;
 }) {
-  const actor = await requireActor();
+  const actor = await requirePageRole([UserRole.USER], "/dashboard/orders");
   const { orderId } = await params;
   const order = await getCustomerOrder(actor, orderId);
   if (!order) notFound();
   const current = steps.indexOf(order.status);
+  const canCancel = canCustomerCancel(actor, order);
   return (
     <section className="mx-auto max-w-3xl">
       <Link
@@ -44,6 +47,7 @@ export default async function CustomerOrderPage({
       <p className="mt-2 text-[#725b4c]">
         Pay at pickup · ETB {order.totalAmount.toFixed(2)}
       </p>
+      {canCancel && <div className="mt-5"><CustomerOrderCancelButton orderId={order.id} /></div>}
       <ol className="mt-7 grid gap-3 sm:grid-cols-5">
         {steps.map((step, index) => {
           const complete = order.status !== "CANCELLED" && index <= current;
@@ -63,6 +67,7 @@ export default async function CustomerOrderPage({
           This order was cancelled and no payment is due.
         </p>
       )}
+      {order.status !== "CANCELLED" && <aside className="mt-5 rounded-xl border border-[#ead9bf] bg-white p-4 text-sm text-[#725b4c]"><p className="font-bold text-[#3b2116]">Need help with this pickup?</p><p className="mt-1">Have your order number ready and speak with the store team at pickup. Online support contacts will be added before production launch.</p></aside>}
       <div className="mt-7 grid gap-5 rounded-3xl border border-[#ead9bf] bg-[#fffaf0] p-6 sm:grid-cols-2">
         <div>
           <h2 className="font-bold text-[#3b2116]">Pickup</h2>
