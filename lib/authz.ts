@@ -10,6 +10,9 @@ import {
 } from "@/lib/rbac";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { loginUrlFor } from "./return-to";
+
+export { safeReturnTo } from "./return-to";
 
 export interface AuthenticatedActor {
   id: string;
@@ -102,20 +105,12 @@ export async function requirePermission({
   return actor;
 }
 
-export function safeReturnTo(value: string | null | undefined): string {
-  if (!value || !value.startsWith("/") || value.startsWith("//")) {
-    return "/dashboard";
-  }
-
-  return value;
-}
-
 export async function requirePageSession(returnTo?: string): Promise<AuthenticatedActor> {
   try {
     return await requireActor();
   } catch (error) {
     if (error instanceof AuthenticationError) {
-      redirect(`/login?returnTo=${encodeURIComponent(safeReturnTo(returnTo))}`);
+      redirect(loginUrlFor(returnTo));
     }
     redirect("/unauthorized");
   }
@@ -129,7 +124,7 @@ export async function requirePageRole(
     return await requireRole(allowedRoles);
   } catch (error) {
     if (error instanceof AuthenticationError) {
-      redirect(`/login?returnTo=${encodeURIComponent(safeReturnTo(returnTo))}`);
+      redirect(loginUrlFor(returnTo));
     }
     redirect("/unauthorized");
   }

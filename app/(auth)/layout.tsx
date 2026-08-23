@@ -1,20 +1,10 @@
 import { CheckCircle, Coffee } from "lucide-react";
-import { auth } from "@/lib/auth";
-import { redirect } from "next/navigation";
-import { headers } from "next/headers";
 
 export default async function AuthLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
-  if (session) {
-    redirect("/dashboard");
-  }
   return (
     <div className="flex min-h-screen w-full min-w-0 flex-1 bg-white">
       {/* Left side - Brand/Content */}

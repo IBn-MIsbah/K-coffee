@@ -3,24 +3,18 @@
 import { Coffee, Eye, EyeClosed } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { signIn } from "@/lib/auth-client"; // Use the client library
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { FieldDescription, Field, FieldLabel } from "../ui/field";
 import { toast } from "sonner";
 
-const LoginForm = () => {
+const LoginForm = ({ returnTo }: { returnTo: string }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const requestedReturnTo = searchParams.get("returnTo");
-  const returnTo =
-    requestedReturnTo?.startsWith("/") && !requestedReturnTo.startsWith("//")
-      ? requestedReturnTo
-      : "/dashboard";
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -95,6 +89,9 @@ const LoginForm = () => {
               <FieldLabel htmlFor="email">Email Address</FieldLabel>
               <Input id="email" name="email" type="email" />
             </Field>
+            <Link href="/forgot-password" className="block text-right text-sm font-semibold text-amber-800 underline">
+              Forgot your password?
+            </Link>
 
             <Field>
               <FieldLabel htmlFor="password">Password</FieldLabel>

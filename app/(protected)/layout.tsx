@@ -5,7 +5,9 @@ export default async function ProtectedLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  await requirePageSession("/dashboard");
+  // The proxy preserves the original protected route. This remains a safe
+  // fallback for deployments where the proxy is not invoked.
+  await requirePageSession();
 
   return <>{children}</>;
 }

@@ -1,5 +1,5 @@
-const UserDashboard = () => {
-  return <div>UserDashboard</div>;
-};
+import { redirect } from "next/navigation";
 
-export default UserDashboard;
+export default function UserDashboard() {
+  redirect("/dashboard/profile");
+}

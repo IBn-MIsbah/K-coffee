@@ -1,9 +1,10 @@
-import { AuthenticationError, AuthorizationError, requirePermission } from "@/lib/authz";
+import { AuthenticationError, AuthorizationError, requireRole } from "@/lib/authz";
 import { CheckoutValidationError, createPickupOrder } from "@/lib/orders/create-pickup-order";
+import { UserRole } from "@/lib/rbac";
 
 export async function POST(request: Request) {
   try {
-    const actor = await requirePermission({ action: "create", resource: "orders" });
+    const actor = await requireRole([UserRole.USER]);
     const body = await request.json();
     const order = await createPickupOrder(actor, body);
     return Response.json({ order }, { status: order.reused ? 200 : 201 });

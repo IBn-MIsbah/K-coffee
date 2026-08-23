@@ -21,6 +21,7 @@ import MenuItemSkeleton from "@/components/menu/MenuItemsSkeloton";
 import Image from "next/image";
 import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
 import { useCart } from "@/lib/store/useCart";
+import { useSession } from "@/lib/auth-client";
 
 interface ProductWithCategory extends Product {
   category?: {
@@ -36,6 +37,7 @@ export default function ProductDetailPage() {
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const { addItem } = useCart();
+  const { data: session, isPending } = useSession();
 
   useEffect(() => {
     if (!productId) return;
@@ -62,12 +64,35 @@ export default function ProductDetailPage() {
     fetchProduct();
   }, [productId, router]);
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     if (!product) return;
+    const role = session?.user?.role;
+    if (!session?.user) {
+      router.push("/login?callbackUrl=%2Fcart");
+      return;
+    }
+    if (role === "CASHIER") {
+      router.push("/pos");
+      return;
+    }
+    if (role === "ADMIN" || role === "SUPERADMIN") {
+      router.push("/admin/dashboard");
+      return;
+    }
+    if (role !== "USER") {
+      toast.error("Your account cannot use the customer cart.");
+      return;
+    }
+    const authorization = await fetch("/api/cart/authorize", { method: "POST" });
+    if (!authorization.ok) {
+      toast.error("Your cart session could not be verified. Please sign in again.");
+      router.push("/login?callbackUrl=%2Fcart");
+      return;
+    }
     const price = Number(product.price);
     addItem({ productId: product.id, name: product.name, price, imageUrl: product.imageUrl }, quantity);
     toast.success(`Added ${quantity} ${product.name} to your cart`, {
-      description: `Total: $${(price * quantity).toFixed(2)}`,
+      description: `Total: ETB ${(price * quantity).toFixed(2)}`,
       action: { label: "View cart", onClick: () => router.push("/cart") },
     });
   };
@@ -204,7 +229,7 @@ export default function ProductDetailPage() {
                 <div className="text-right">
                   <p className="text-sm text-gray-500">Total Price</p>
                   <p className="text-2xl font-bold text-amber-700">
-                    $
+                    ETB
                     {(typeof product.price === "number"
                       ? product.price * quantity
                       : parseFloat(product.price as any) * quantity
@@ -215,6 +240,7 @@ export default function ProductDetailPage() {
 
               <Button
                 onClick={handleAddToCart}
+                disabled={isPending}
                 className="w-full py-6 text-lg font-bold bg-amber-600 hover:bg-amber-700 text-white"
                 size="lg"
               >

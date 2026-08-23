@@ -1,5 +1,5 @@
-const OrdersPage = () => {
-  return <div>OrdersPage</div>;
-};
+import { redirect } from "next/navigation";
 
-export default OrdersPage;
+export default function OrdersPage() {
+  redirect("/dashboard/orders");
+}

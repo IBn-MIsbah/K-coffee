@@ -4,10 +4,19 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Coffee, MapPin, Quote, Star } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
+import { getCurrentActor } from "@/lib/authz";
+import { UserRole } from "@/lib/rbac";
+import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
-export default function Home() {
+export default async function Home() {
+  const actor = await getCurrentActor();
+  if (actor?.role === UserRole.CASHIER) redirect("/pos");
+  if (actor?.role === UserRole.ADMIN || actor?.role === UserRole.SUPERADMIN) {
+    redirect("/admin/dashboard");
+  }
+
   return (
     <div className="overflow-hidden bg-[#f7f1e6] text-[#20130e]">
       <section className="relative isolate min-h-[650px] overflow-hidden bg-[#1e120e] sm:min-h-[720px]">

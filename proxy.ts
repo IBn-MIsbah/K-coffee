@@ -1,4 +1,5 @@
 import { auth } from "@/lib/auth";
+import { loginUrlFor } from "@/lib/return-to";
 import { NextRequest, NextResponse } from "next/server";
 
 /**
@@ -8,17 +9,26 @@ import { NextRequest, NextResponse } from "next/server";
  */
 export async function proxy(request: NextRequest) {
   const session = await auth.api.getSession({ headers: request.headers });
-  if (session?.user) return NextResponse.next();
+  const pathname = request.nextUrl.pathname;
 
-  const loginUrl = new URL("/login", request.url);
-  loginUrl.searchParams.set(
-    "returnTo",
-    `${request.nextUrl.pathname}${request.nextUrl.search}`
-  );
+  if (session?.user) {
+    const role = session.user.role;
+    if (pathname === "/" && role === "CASHIER") {
+      return NextResponse.redirect(new URL("/pos", request.url));
+    }
+    if (pathname === "/" && (role === "ADMIN" || role === "SUPERADMIN")) {
+      return NextResponse.redirect(new URL("/admin/dashboard", request.url));
+    }
+    return NextResponse.next();
+  }
+
+  if (pathname === "/") return NextResponse.next();
+
+  const loginUrl = new URL(loginUrlFor(pathname), request.url);
 
   return NextResponse.redirect(loginUrl);
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/orders/:path*"],
+  matcher: ["/", "/admin/:path*", "/cart", "/checkout", "/dashboard/:path*", "/orders/:path*", "/pos"],
 };
