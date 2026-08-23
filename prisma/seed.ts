@@ -28,6 +28,12 @@ async function seed() {
       role: UserRole.CASHIER,
       password: "Cashier123!",
     },
+    {
+      email: "customer@coffeeshop.com",
+      name: "Sample Customer",
+      role: UserRole.USER,
+      password: "Customer123!",
+    },
   ];
 
   for (const userData of initialUsers) {
@@ -112,7 +118,10 @@ async function seed() {
   });
 
   const cashier = await prisma.user.findUnique({ where: { email: "cashier@coffeeshop.com" } });
-  if (cashier) await prisma.staffStoreAssignment.upsert({ where: { userId_storeId: { userId: cashier.id, storeId: "k-coffee-addis-ababa" } }, update: {}, create: { userId: cashier.id, storeId: "k-coffee-addis-ababa" } });
+  if (cashier) {
+    const assignment = await prisma.staffStoreAssignment.findFirst({ where: { userId: cashier.id, storeId: "k-coffee-addis-ababa", endedAt: null }, select: { id: true } });
+    if (!assignment) await prisma.staffStoreAssignment.create({ data: { userId: cashier.id, storeId: "k-coffee-addis-ababa", reason: "Development seed assignment" } });
+  }
 
   const products = [
     { name: "Espresso", category: "Coffee", price: 3.5 },

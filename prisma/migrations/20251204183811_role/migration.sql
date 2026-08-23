@@ -1,2 +1,0 @@
--- CreateEnum
-CREATE TYPE "UserRole" AS ENUM ('SUPERADMIN', 'ADMIN', 'USER', 'CASHIER');

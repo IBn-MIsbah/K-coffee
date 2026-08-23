@@ -21,6 +21,9 @@ model User {
   phone         String?
   image         String?
   preferences   Json? // e.g., favorite drinks, milk preference
+  isActive      Boolean  @default(true)
+  deactivatedAt DateTime?
+  deactivatedById String?
 
   role         UserRole      @default(USER)
   orders       Order[]
@@ -140,9 +143,27 @@ model StaffStoreAssignment {
   user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   store     StoreLocation @relation(fields: [storeId], references: [id], onDelete: Cascade)
   createdAt DateTime      @default(now())
+  endedAt   DateTime?
+  reason    String?
+  assignedById String?
+  endedById String?
 
-  @@unique([userId, storeId])
+  @@index([userId, storeId, endedAt])
   @@index([storeId])
+}
+
+model StaffInvitation {
+  id          String   @id @default(cuid())
+  email       String
+  role        UserRole
+  tokenHash   String   @unique
+  expiresAt   DateTime
+  acceptedAt  DateTime?
+  createdById String
+  createdAt   DateTime @default(now())
+
+  @@index([email])
+  @@index([expiresAt])
 }
 
 enum OrderStatus {
