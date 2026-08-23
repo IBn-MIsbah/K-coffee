@@ -1,6 +1,8 @@
 import Footer from "@/components/Home/componenets/Footer";
 import Header from "@/components/Home/componenets/Header";
 
+export const dynamic = "force-dynamic";
+
 export default function PublicLayout({
   children,
 }: Readonly<{
