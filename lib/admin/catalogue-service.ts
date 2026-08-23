@@ -166,6 +166,7 @@ export async function setAdminCategoryActive(
     isActive ? "restore" : "archive",
     "categories",
     { categoryId: id, name: updated.name },
+    id,
   );
   return updated;
 }
@@ -266,6 +267,7 @@ export async function setAdminProductActive(
       isActive ? "restore" : "archive",
       "products",
       { productId: id, name: product.name },
+      id,
     );
     return product;
   } catch (error) {

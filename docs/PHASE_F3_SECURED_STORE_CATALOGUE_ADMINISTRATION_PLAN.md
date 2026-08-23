@@ -19,10 +19,12 @@
 | F3.0 contracts | Complete | Validation modules, lifecycle semantics, and audit vocabulary are implemented in `lib/admin/`. |
 | F3.1 data model | Ready for staging verification | The new lifecycle migration is ordered as one migration and `prisma validate` passes. Local `prisma migrate status` cannot connect to the configured PostgreSQL instance, so migration deploy and seed validation must run against CI or a disposable staging database. |
 | F3.2–F3.5 administration | Implemented | Authorized store and catalogue APIs, lifecycle-aware dashboard screens, image upload, audit logging, and public visibility filters are in place. |
-| F3.6 automated evidence | Partial | Unit validation coverage is present. PostgreSQL integration tests and browser role-flow tests remain required before the phase can be declared complete. |
+| F3.6 automated evidence | In progress | Unit validation coverage and a PostgreSQL catalogue lifecycle suite are present. Browser role-flow coverage and execution of the integration suite against CI/staging remain required. |
 | F3.7 release preparation | Pending | Apply and verify the migration once in staging, then commit the work in the planned dependency order. |
 
 **Current release blocker:** do not deploy the new schema until `npx prisma migrate deploy`, `npx prisma migrate status`, and a seed/smoke flow have passed against a disposable PostgreSQL database. The configured local database did not return a usable schema-engine response on 2026-08-23.
+
+**Integration-test safety:** `npm run test:integration` only accepts a database whose name contains `test` or `ci`. Run `npm run db:test:setup` to create/migrate the default `k_coffee_test` database, then set `TEST_DATABASE_URL` to that database before `npm run test:integration`. The test suite will never run against the normal local `k_coffee` database.
 
 ## Current baseline
 

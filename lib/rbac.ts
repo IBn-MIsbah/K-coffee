@@ -150,7 +150,8 @@ export async function logAudit(
   userRole: UserRole,
   action: string,
   resource: string,
-  details?: Prisma.InputJsonValue
+  details?: Prisma.InputJsonValue,
+  resourceId?: string,
 ) {
   return prisma.auditLog.create({
     data: {
@@ -158,6 +159,7 @@ export async function logAudit(
       userRole,
       action,
       resource,
+      resourceId,
       details,
     },
   });
