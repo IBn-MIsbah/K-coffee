@@ -52,10 +52,13 @@ model Product {
 }
 
 model Category {
-  id       String    @id @default(cuid())
-  name     String // e.g., "Coffee", "Tea", "Pastries"
-  slug     String    @unique
-  products Product[]
+  id        String    @id @default(cuid())
+  name      String // e.g., "Coffee", "Tea", "Pastries"
+  slug      String    @unique
+  isActive  Boolean   @default(true)
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
 model Order {
@@ -123,6 +126,8 @@ model StoreLocation {
   pickupCapacity        Int                    @default(10)
   coordinates           String? // For maps integration
   isActive              Boolean                @default(true)
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
   orders                Order[]
   reservations          Reservation[]
   staffAssignments      StaffStoreAssignment[]
