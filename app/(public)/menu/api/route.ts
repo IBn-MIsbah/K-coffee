@@ -8,12 +8,13 @@ export const GET = async (req: NextRequest) => {
 
   const whereClause: {
     isActive: boolean;
-    category?: { name: { contains: string; mode: "insensitive" } };
+    category?: { isActive: boolean; name?: { contains: string; mode: "insensitive" } };
     name?: { contains: string; mode: "insensitive" };
-  } = { isActive: true };
+  } = { isActive: true, category: { isActive: true } };
 
   if (categoryFilter) {
     whereClause.category = {
+      isActive: true,
       name: {
         contains: categoryFilter,
         mode: "insensitive",

@@ -5,6 +5,7 @@ import Link from "next/link";
 const PopularItemsCard = async () => {
   const products = await prisma.product.findMany({
     take: 3,
+    where: { isActive: true, category: { isActive: true } },
     orderBy: { createdAt: "desc" },
   });
 

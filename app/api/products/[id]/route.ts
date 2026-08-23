@@ -8,7 +8,7 @@ export const GET = async (
   try {
     const { id } = await params;
     const product = await prisma.product.findFirst({
-      where: { id, isActive: true },
+      where: { id, isActive: true, category: { isActive: true } },
       include: { category: { select: { name: true, slug: true } } },
     });
 

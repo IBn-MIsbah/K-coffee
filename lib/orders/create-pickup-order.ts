@@ -85,7 +85,7 @@ export async function createPickupOrder(actor: AuthenticatedActor, input: Pickup
   });
   if (concurrentOrders >= store.pickupCapacity) throw new CheckoutValidationError("That pickup slot is full. Choose another time.");
 
-  const products = await prisma.product.findMany({ where: { id: { in: [...quantities.keys()] }, isActive: true } });
+  const products = await prisma.product.findMany({ where: { id: { in: [...quantities.keys()] }, isActive: true, category: { isActive: true } } });
   if (products.length !== quantities.size) throw new CheckoutValidationError("One or more products are no longer available.");
 
   const subtotal = products.reduce((sum, product) => sum.add(product.price.mul(quantities.get(product.id) ?? 0)), new Prisma.Decimal(0));
