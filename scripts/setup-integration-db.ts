@@ -35,6 +35,10 @@ async function main() {
     stdio: "inherit",
     env: { ...process.env, DATABASE_URL: testUrl.toString(), TEST_DATABASE_URL: testUrl.toString() },
   });
+  execFileSync("npx", ["prisma", "db", "seed"], {
+    stdio: "inherit",
+    env: { ...process.env, DATABASE_URL: testUrl.toString(), TEST_DATABASE_URL: testUrl.toString(), NODE_ENV: "development" },
+  });
 }
 
 main().catch((error) => { console.error(error); process.exitCode = 1; });

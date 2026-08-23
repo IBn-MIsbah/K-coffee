@@ -1,6 +1,5 @@
 import prisma from "@/lib/prisma";
 import { initializePermissions, UserRole } from "@/lib/rbac";
-import { auth } from "@/lib/auth";
 import { hashPassword } from "better-auth/crypto";
 
 async function seed() {
@@ -38,14 +37,18 @@ async function seed() {
     });
 
     if (!existing) {
-      // Creating the user and linking the account exactly how Better Auth expects
-      await auth.api.signUpEmail({
-        body: {
+      // Keep seed execution independent from Next.js server-only email modules.
+      // The credential record follows the same Better Auth account shape.
+      const user = await prisma.user.create({
+        data: {
+          id: crypto.randomUUID(),
           email: userData.email,
-          password: userData.password,
           name: userData.name,
+          role: userData.role,
+          emailVerified: true,
         },
       });
+      await prisma.account.create({ data: { id: crypto.randomUUID(), issuer: "local:credential", accountId: user.id, providerId: "credential", userId: user.id, password: await hashPassword(userData.password) } });
 
       console.log(`${userData.name} created.`);
     } else if (
