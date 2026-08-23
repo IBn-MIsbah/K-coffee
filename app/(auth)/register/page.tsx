@@ -1,4 +1,5 @@
 "use client";
+import { Suspense } from "react";
 import { Coffee, Eye, EyeClosed } from "lucide-react";
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -253,4 +254,10 @@ const RegisterForm = () => {
   );
 };
 
-export default RegisterForm;
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={null}>
+      <RegisterForm />
+    </Suspense>
+  );
+}
