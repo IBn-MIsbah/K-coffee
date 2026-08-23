@@ -1,13 +1,15 @@
-export default function PrivacyPage() {
-  return (
-    <div className="min-h-screen bg-gray-50 pt-24 pb-12 flex items-center justify-center">
-      <div className="max-w-4xl mx-auto px-4 text-center">
-        <h1 className="text-4xl md:text-5xl font-extrabold text-amber-900 mb-6">Privacy Policy</h1>
-        <p className="text-lg text-gray-700 max-w-2xl mx-auto">
-          Your privacy is important to us. Learn how we collect, use, and protect your information.
-        </p>
-        <div className="mt-12 text-3xl font-bold text-amber-600">Coming Soon</div>
-      </div>
-    </div>
-  );
+import Link from "next/link";
+import prisma from "@/lib/prisma";
+
+export const dynamic = "force-dynamic";
+
+export default async function PrivacyPage() {
+  const store = await prisma.storeLocation.findFirst({ where: { isActive: true }, select: { address: true }, orderBy: { name: "asc" } });
+  const configuredFrom = process.env.EMAIL_FROM ?? "";
+  const email = configuredFrom.match(/<([^>]+)>/)?.[1] ?? (configuredFrom.includes("@") ? configuredFrom : null);
+  return <main className="min-h-dvh bg-[#f7f1e6] px-4 pb-16 pt-28 sm:px-6"><article className="mx-auto max-w-3xl rounded-3xl border border-[#ead9bf] bg-[#fffaf0] p-6 shadow-[0_18px_45px_rgba(88,49,22,.08)] sm:p-10"><header className="border-b border-[#ead9bf] pb-7"><p className="text-xs font-bold uppercase tracking-[.22em] text-[#a56328]">Legal</p><h1 className="mt-3 text-4xl font-extrabold tracking-[-.04em] text-[#2c1911]">Privacy Policy</h1><p className="mt-3 text-sm text-[#725b4c]">Last updated: August 23, 2026</p><p className="mt-5 leading-7 text-[#725b4c]">K-Coffee values your privacy and is committed to protecting the information you share when you browse our website, create an account, and place pickup orders.</p></header><div className="mt-8 space-y-8 leading-7 text-[#5f4739]"><PolicySection title="1. Information We Collect"><ul><li><strong>Account information:</strong> name, email address, securely hashed password, and optional phone number.</li><li><strong>Order details:</strong> items, totals, selected pickup location, scheduled pickup time, notes, and order history.</li><li><strong>Technical data:</strong> IP address, browser/device information, access timestamps, and necessary session cookies.</li></ul></PolicySection><PolicySection title="2. How We Use Your Information"><ul><li>To create and secure your account, process pickup orders, and support store fulfilment.</li><li>To provide account-verification and password-recovery emails, security notices, and other necessary service communications.</li><li>To prevent unauthorized access, fraud, and abuse, and to improve reliability and usability.</li></ul></PolicySection><PolicySection title="3. Cookies and Session Storage"><p>We use essential cookies and session storage to keep you signed in, maintain your active cart and checkout state, and protect authentication endpoints from cross-site request forgery. Disabling essential cookies may prevent sign-in or checkout.</p></PolicySection><PolicySection title="4. How We Share Your Information"><p>We do not sell, rent, or trade personal information. We share only the information necessary with email and infrastructure providers, authorized store personnel preparing an order, and authorities when required by applicable law or necessary to protect people and property.</p></PolicySection><PolicySection title="5. Data Retention and Security"><p>We retain account and order information while an account is active and as needed for operational, accounting, tax, and legal obligations. We use administrative and technical safeguards, including encrypted transport and salted password hashing, to protect this information.</p></PolicySection><PolicySection title="6. Your Rights and Choices"><p>Depending on your jurisdiction, you may request access to, correction of, or deletion of personal information, or ask questions about how it is used. You can update available account details from your profile. Contact us for requests that cannot be completed in the product.</p></PolicySection><PolicySection title="7. Changes to This Policy"><p>We may update this policy to reflect changes to the service or applicable requirements. The current version and its updated date will be posted on this page.</p></PolicySection><PolicySection title="8. Contact Us"><p>For privacy questions or requests, contact K-Coffee{email ? <> at <a className="font-semibold text-[#8d4d20] underline" href={`mailto:${email}`}>{email}</a></> : <> through our <Link className="font-semibold text-[#8d4d20] underline" href="/contact">contact page</Link></>}.{store?.address && <> Our listed business address is {store.address}.</>}</p></PolicySection></div></article></main>;
+}
+
+function PolicySection({ title, children }: { title: string; children: React.ReactNode }) {
+  return <section><h2 className="text-xl font-extrabold text-[#3b2116]">{title}</h2><div className="mt-3 space-y-3 [&_ul]:list-disc [&_ul]:space-y-2 [&_ul]:pl-6">{children}</div></section>;
 }

@@ -2,15 +2,16 @@ import {
   Phone,
   Mail,
   MapPin,
-  Facebook,
-  Instagram,
-  Twitter,
 } from "lucide-react";
 import Link from "next/link";
+import prisma from "@/lib/prisma";
 
-const Footer = () => {
+const Footer = async () => {
   const date = new Date();
   const year = date.getFullYear();
+  const store = await prisma.storeLocation.findFirst({ where: { isActive: true }, select: { address: true, phone: true }, orderBy: { name: "asc" } });
+  const configuredFrom = process.env.EMAIL_FROM ?? "";
+  const email = configuredFrom.match(/<([^>]+)>/)?.[1] ?? (configuredFrom.includes("@") ? configuredFrom : null);
 
   // Styling for internal links (formerly FooterLink component)
   const linkClasses =
@@ -74,35 +75,32 @@ const Footer = () => {
               Get In Touch
             </h3>
             <div className="space-y-4">
-              {/* Phone */}
-              <div className="flex items-center gap-3 justify-center md:justify-end">
+              {store && <div className="flex items-center gap-3 justify-center md:justify-end">
                 <Phone className="w-5 h-5 text-amber-400" />
                 <a
-                  href="tel:+251987654321"
+                  href={`tel:${store.phone.replace(/[^+\d]/g, "")}`}
                   className="text-amber-100 text-base hover:text-amber-300 transition-colors"
                 >
-                  +251 987 654 321
+                  {store.phone}
                 </a>
-              </div>
+              </div>}
 
-              {/* Mail */}
-              <div className="flex items-center gap-3 justify-center md:justify-end">
+              {email && <div className="flex items-center gap-3 justify-center md:justify-end">
                 <Mail className="w-5 h-5 text-amber-400" />
                 <a
-                  href="mailto:info@k-coffee.com"
+                  href={`mailto:${email}`}
                   className="text-amber-100 text-base hover:text-amber-300 transition-colors"
                 >
-                  info@k-coffee.com
+                  {email}
                 </a>
-              </div>
+              </div>}
 
-              {/* Location */}
-              <div className="flex items-center gap-3 justify-center md:justify-end">
+              {store && <div className="flex items-center gap-3 justify-center md:justify-end">
                 <MapPin className="w-5 h-5 text-amber-400" />
                 <span className="text-amber-100 text-base">
-                  123 Coffee Street, City Center
+                  {store.address}
                 </span>
-              </div>
+              </div>}
             </div>
           </div>
         </div>
@@ -112,21 +110,8 @@ const Footer = () => {
 
         {/* --- Social Links and Copyright --- */}
         <div className="flex flex-col sm:flex-row justify-between items-center text-center sm:text-left space-y-4 sm:space-y-0">
-          {/* Social Links */}
-          <div className="flex justify-center gap-4 order-2 sm:order-1">
-            <a href="#">
-              <Facebook className="w-7 h-7 p-1 rounded-full bg-amber-800 text-amber-100 hover:bg-amber-700 cursor-pointer transition-colors" />
-            </a>
-            <a href="#">
-              <Instagram className="w-7 h-7 p-1 rounded-full bg-amber-800 text-amber-100 hover:bg-amber-700 cursor-pointer transition-colors" />
-            </a>
-            <a href="#">
-              <Twitter className="w-7 h-7 p-1 rounded-full bg-amber-800 text-amber-100 hover:bg-amber-700 cursor-pointer transition-colors" />
-            </a>
-          </div>
-
           {/* Copyright & Policy Links */}
-          <div className="flex flex-col sm:flex-row items-center gap-4 text-xs order-1 sm:order-2">
+          <div className="flex flex-col sm:flex-row items-center gap-4 text-xs">
             <p className="text-amber-200">
               &copy; {year} K-Coffee. All rights reserved.
             </p>

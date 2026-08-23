@@ -1,13 +1,6 @@
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+
 export default function CareersPage() {
-  return (
-    <div className="min-h-screen bg-gray-50 pt-24 pb-12 flex items-center justify-center">
-      <div className="max-w-4xl mx-auto px-4 text-center">
-        <h1 className="text-4xl md:text-5xl font-extrabold text-amber-900 mb-6">Careers</h1>
-        <p className="text-lg text-gray-700 max-w-2xl mx-auto">
-          Join our growing team and help us build the best coffee experience. Check out our open positions.
-        </p>
-        <div className="mt-12 text-3xl font-bold text-amber-600">Coming Soon</div>
-      </div>
-    </div>
-  );
+  return <main className="grid min-h-dvh place-items-center bg-[#f7f1e6] px-4 py-24 text-center sm:px-6"><section className="max-w-xl rounded-3xl border border-[#ead9bf] bg-[#fffaf0] p-8 shadow-[0_18px_45px_rgba(88,49,22,.08)] sm:p-10"><p className="text-xs font-bold uppercase tracking-[.22em] text-[#a56328]">Careers</p><h1 className="mt-3 text-4xl font-extrabold tracking-[-.04em] text-[#2c1911]">No roles are published right now.</h1><p className="mt-4 leading-7 text-[#725b4c]">When K-Coffee has an open role, it will be listed here with the job details and application process.</p><Button asChild variant="outline" className="mt-7 min-h-11 rounded-full border-[#dfc6a9] bg-white text-[#3b2116] hover:bg-[#f7ebd8]"><Link href="/locations">View locations</Link></Button></section></main>;
 }

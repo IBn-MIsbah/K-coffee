@@ -1,13 +1,15 @@
-export default function LocationsPage() {
-  return (
-    <div className="min-h-screen bg-gray-50 pt-24 pb-12 flex items-center justify-center">
-      <div className="max-w-4xl mx-auto px-4 text-center">
-        <h1 className="text-4xl md:text-5xl font-extrabold text-amber-900 mb-6">Our Locations</h1>
-        <p className="text-lg text-gray-700 max-w-2xl mx-auto">
-          Find a K-Coffee shop near you. We have multiple locations serving fresh, high-quality coffee daily.
-        </p>
-        <div className="mt-12 text-3xl font-bold text-amber-600">Coming Soon</div>
-      </div>
-    </div>
-  );
+import { Clock3, MapPin, Phone, ShoppingBag } from "lucide-react";
+import Link from "next/link";
+import prisma from "@/lib/prisma";
+import { Button } from "@/components/ui/button";
+
+export const dynamic = "force-dynamic";
+
+type DayHours = { open?: string; close?: string };
+const days = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] as const;
+const dayLabels: Record<(typeof days)[number], string> = { mon: "Monday", tue: "Tuesday", wed: "Wednesday", thu: "Thursday", fri: "Friday", sat: "Saturday", sun: "Sunday" };
+
+export default async function LocationsPage() {
+  const stores = await prisma.storeLocation.findMany({ where: { isActive: true }, select: { id: true, name: true, address: true, phone: true, hours: true, timezone: true, pickupIntervalMinutes: true, pickupLeadTimeMinutes: true }, orderBy: { name: "asc" } });
+  return <main className="min-h-dvh bg-[#f7f1e6] px-4 pb-16 pt-28 sm:px-6 lg:px-8"><section className="mx-auto max-w-6xl"><header className="max-w-2xl"><p className="text-xs font-bold uppercase tracking-[.22em] text-[#a56328]">Visit K-Coffee</p><h1 className="mt-3 text-4xl font-extrabold tracking-[-.04em] text-[#2c1911] sm:text-5xl">Find your pickup location</h1><p className="mt-4 text-lg leading-8 text-[#725b4c]">Choose from our active locations. Hours are shown in each shop&apos;s local time.</p></header>{stores.length === 0 ? <section className="mt-10 rounded-3xl border border-[#ead9bf] bg-[#fffaf0] p-8 text-center shadow-[0_18px_45px_rgba(88,49,22,.08)]"><MapPin aria-hidden="true" className="mx-auto size-9 text-[#a56328]" /><h2 className="mt-4 text-2xl font-bold text-[#3b2116]">No locations are available yet</h2><p className="mt-2 text-[#725b4c]">Please check back soon or contact the shop directly for assistance.</p></section> : <div className="mt-10 grid gap-6 lg:grid-cols-2">{stores.map((store) => { const hours = store.hours as Record<string, DayHours>; return <article key={store.id} className="rounded-3xl border border-[#ead9bf] bg-[#fffaf0] p-6 shadow-[0_18px_45px_rgba(88,49,22,.08)] sm:p-8"><div className="flex items-start gap-4"><span className="grid size-11 shrink-0 place-items-center rounded-full bg-[#f5dfba] text-[#9b5828]"><MapPin aria-hidden="true" className="size-5" /></span><div><h2 className="text-2xl font-extrabold text-[#3b2116]">{store.name}</h2><p className="mt-2 text-[#725b4c]">{store.address}</p><a href={`tel:${store.phone.replace(/[^+\d]/g, "")}`} className="mt-2 inline-flex items-center gap-2 text-sm font-bold text-[#8d4d20] underline"><Phone aria-hidden="true" className="size-4" /> {store.phone}</a></div></div><div className="mt-7 grid gap-5 border-t border-[#ead9bf] pt-6 sm:grid-cols-[1fr_auto]"><div><p className="flex items-center gap-2 text-sm font-bold text-[#3b2116]"><Clock3 aria-hidden="true" className="size-4 text-[#a56328]" /> Opening hours</p><dl className="mt-3 space-y-1 text-sm text-[#725b4c]">{days.map((day) => <div key={day} className="flex justify-between gap-6"><dt>{dayLabels[day]}</dt><dd className="font-medium text-[#3b2116]">{hours[day]?.open && hours[day]?.close ? `${hours[day].open}–${hours[day].close}` : "Closed"}</dd></div>)}</dl></div><div className="rounded-2xl bg-[#f7ebd8] p-4 text-sm text-[#725b4c]"><p className="font-bold text-[#3b2116]">Pickup</p><p className="mt-1">Every {store.pickupIntervalMinutes} minutes</p><p className="mt-1">Order {store.pickupLeadTimeMinutes} min ahead</p><p className="mt-3 text-xs">{store.timezone}</p></div></div><Button asChild className="mt-7 min-h-11 w-full rounded-full bg-[#b56527] font-bold text-white hover:bg-[#934817]"><Link href="/menu"><ShoppingBag aria-hidden="true" className="size-4" /> Browse the menu</Link></Button></article>; })}</div>}</section></main>;
 }
