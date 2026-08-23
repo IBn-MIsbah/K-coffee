@@ -2,19 +2,24 @@ import "server-only";
 
 import nodemailer from "nodemailer";
 
-function requiredEmailEnvironment(name: "EMAIL_SERVER_USER" | "EMAIL_SERVER_PASSWORD" | "EMAIL_FROM") {
+function requiredEmailEnvironment(
+  name: "EMAIL_SERVER_USER" | "EMAIL_SERVER_PASSWORD" | "EMAIL_FROM",
+) {
   const value = process.env[name]?.trim();
-  if (!value) throw new Error(`${name} must be configured before sending email.`);
+  if (!value)
+    throw new Error(`${name} must be configured before sending email.`);
   return value;
 }
 
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: requiredEmailEnvironment("EMAIL_SERVER_USER"),
-    pass: requiredEmailEnvironment("EMAIL_SERVER_PASSWORD"),
-  },
-});
+function transporter() {
+  return nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: requiredEmailEnvironment("EMAIL_SERVER_USER"),
+      pass: requiredEmailEnvironment("EMAIL_SERVER_PASSWORD"),
+    },
+  });
+}
 
 export async function sendAuthEmail({
   to,
@@ -25,7 +30,7 @@ export async function sendAuthEmail({
   subject: string;
   text: string;
 }) {
-  await transporter.sendMail({
+  await transporter().sendMail({
     from: requiredEmailEnvironment("EMAIL_FROM"),
     to,
     subject,

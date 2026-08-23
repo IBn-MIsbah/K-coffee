@@ -9,10 +9,10 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ us
     const { role } = await request.json();
     if (!Object.values(UserRole).includes(role)) return Response.json({ error: "Invalid role." }, { status: 422 });
     const user = await prisma.$transaction(async (tx) => {
-      const subject = await tx.user.findUnique({ where: { id: userId }, select: { id: true, role: true } });
+      const subject = await tx.user.findUnique({ where: { id: userId }, select: { id: true, role: true, isActive: true } });
       if (!subject) throw new Error("NOT_FOUND");
       if (subject.role === UserRole.SUPERADMIN && role !== UserRole.SUPERADMIN) {
-        const count = await tx.user.count({ where: { role: UserRole.SUPERADMIN } });
+        const count = await tx.user.count({ where: { role: UserRole.SUPERADMIN, isActive: true } });
         if (count <= 1) throw new Error("LAST_SUPERADMIN");
       }
       const updated = await tx.user.update({ where: { id: userId }, data: { role }, select: { id: true, role: true } });
