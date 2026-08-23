@@ -1,9 +1,10 @@
 "use client";
 import { Coffee, Eye, EyeClosed } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { signUp } from "@/lib/auth-client";
+import { useRouter, useSearchParams } from "next/navigation";
+import { signUp, useSession } from "@/lib/auth-client";
+import { safeReturnTo } from "@/lib/return-to";
 import { Button } from "@/components/ui/button";
 import { FieldDescription, Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
@@ -16,6 +17,13 @@ const RegisterForm = () => {
   const [error, setError] = useState<string>("");
   const [success, setSuccess] = useState<string>("");
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const { data: session } = useSession();
+  const returnTo = safeReturnTo(searchParams.get("callbackUrl") ?? searchParams.get("returnTo"));
+
+  useEffect(() => {
+    if (session?.user && !success) router.replace(returnTo);
+  }, [returnTo, router, session?.user, success]);
 
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
@@ -50,8 +58,8 @@ const RegisterForm = () => {
       return;
     }
 
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters");
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters");
       setIsSubmitting(false);
       return;
     }
@@ -61,16 +69,15 @@ const RegisterForm = () => {
         name,
         email,
         password,
-        callbackURL: "/dashboard",
+        callbackURL: `${window.location.origin}/verify-email`,
       });
 
       if (result.error) {
         setError(result.error.message || "Registration failed");
       } else {
-        setSuccess("Registration successful! Redirecting...");
-        // Redirect to dashboard after a short delay
+        setSuccess("Registration successful! Check your inbox to verify your email.");
         setTimeout(() => {
-          router.push("/dashboard");
+          router.push("/verify-email");
           router.refresh();
         }, 2000);
       }
