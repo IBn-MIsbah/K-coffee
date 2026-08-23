@@ -5,7 +5,8 @@ import { CatalogueValidationError, parseCategoryInput } from "@/lib/admin/catalo
 function errorResponse(error: unknown) {
   if (error instanceof AuthenticationError) return Response.json({ error: error.message }, { status: 401 });
   if (error instanceof AuthorizationError) return Response.json({ error: error.message }, { status: 403 });
-  if (error instanceof CatalogueValidationError || error instanceof CatalogueConflictError) return Response.json({ error: error.message }, { status: 422 });
+  if (error instanceof CatalogueValidationError) return Response.json({ error: error.message }, { status: 422 });
+  if (error instanceof CatalogueConflictError) return Response.json({ error: error.message }, { status: 409 });
   return Response.json({ error: "Unable to manage categories." }, { status: 500 });
 }
 
