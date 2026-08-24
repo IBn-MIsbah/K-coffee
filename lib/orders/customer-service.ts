@@ -4,6 +4,7 @@ import { canCancelOrder } from "@/lib/order-policy";
 import { customerOrderHistoryStatuses, type CustomerOrderHistoryFilters } from "@/lib/orders/customer-order-validation";
 import prisma from "@/lib/prisma";
 import { UserRole } from "@/lib/rbac";
+import { buildCustomerReorderPreview } from "./reorder-policy";
 
 export async function listCustomerOrders(actor: AuthenticatedActor, filters: CustomerOrderHistoryFilters) {
   if (actor.role !== UserRole.USER) throw new AuthorizationError();
@@ -64,4 +65,33 @@ export async function cancelCustomerOrder(
     });
     return updated;
   });
+}
+
+export async function getCustomerReorderPreview(
+  actor: AuthenticatedActor,
+  orderId: string,
+) {
+  if (actor.role !== UserRole.USER) throw new AuthorizationError();
+  const order = await prisma.order.findFirst({
+    where: { id: orderId, userId: actor.id, status: { in: ["COMPLETED", "CANCELLED"] } },
+    select: {
+      items: {
+        select: {
+          quantity: true,
+          product: {
+            select: {
+              id: true,
+              name: true,
+              price: true,
+              imageUrl: true,
+              isActive: true,
+              category: { select: { isActive: true } },
+            },
+          },
+        },
+      },
+    },
+  });
+  if (!order) throw new AuthorizationError();
+  return buildCustomerReorderPreview(order.items);
 }

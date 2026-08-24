@@ -21,6 +21,7 @@ export interface CartProduct {
 interface CartStore {
   items: CartItem[];
   addItem: (product: CartProduct, quantity?: number) => void;
+  replaceItems: (items: CartItem[]) => void;
   setQuantity: (productId: string, quantity: number) => void;
   incrementItem: (productId: string) => void;
   decrementItem: (productId: string) => void;
@@ -103,6 +104,7 @@ export const useCart = create<CartStore>()(
           };
         });
       },
+      replaceItems: (items) => set({ items: sanitizeCartItems(items) }),
       setQuantity: (productId, requestedQuantity) => {
         const quantity = normalizeQuantity(requestedQuantity);
         set((state) => ({

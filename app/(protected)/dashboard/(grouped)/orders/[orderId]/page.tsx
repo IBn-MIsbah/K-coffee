@@ -1,6 +1,7 @@
 import { requirePageRole } from "@/lib/authz";
 import { canCustomerCancel, getCustomerOrder } from "@/lib/orders/customer-service";
 import CustomerOrderCancelButton from "@/components/orders/CustomerOrderCancelButton";
+import CustomerOrderReorderButton from "@/components/orders/CustomerOrderReorderButton";
 import { UserRole } from "@/lib/rbac";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -48,6 +49,7 @@ export default async function CustomerOrderPage({
         Pay at pickup · ETB {order.totalAmount.toFixed(2)}
       </p>
       {canCancel && <div className="mt-5"><CustomerOrderCancelButton orderId={order.id} /></div>}
+      {(order.status === "COMPLETED" || order.status === "CANCELLED") && <div className="mt-5"><CustomerOrderReorderButton orderId={order.id} /></div>}
       <ol className="mt-7 grid gap-3 sm:grid-cols-5">
         {steps.map((step, index) => {
           const complete = order.status !== "CANCELLED" && index <= current;

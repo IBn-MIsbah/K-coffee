@@ -1,6 +1,7 @@
 "use client";
 
 import CustomerOrderCancelButton from "@/components/orders/CustomerOrderCancelButton";
+import CustomerOrderReorderButton from "@/components/orders/CustomerOrderReorderButton";
 import Link from "next/link";
 
 type Order = {
@@ -38,6 +39,7 @@ export default function OrderList({ orders, view, error }: { orders: Order[]; vi
           </div>
         </div>
         {order.canCancel && <div className="mt-4"><CustomerOrderCancelButton orderId={order.id} /></div>}
+        {(order.status === "COMPLETED" || order.status === "CANCELLED") && <div className="mt-4"><CustomerOrderReorderButton orderId={order.id} /></div>}
       </article>)}
       {!orders.length && <div className="rounded-2xl border border-dashed border-[#dfc6a9] p-10 text-center text-[#725b4c]">No {viewLabels[view].toLowerCase()} yet. Your pickup orders will appear here.</div>}
     </div>
