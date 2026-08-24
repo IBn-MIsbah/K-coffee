@@ -6,6 +6,7 @@ import MenuItems from "@/components/menu/MenuItems";
 import MenuItemSkeleton from "@/components/menu/MenuItemsSkeloton";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
+import { useSession } from "@/lib/auth-client";
 
 const FILTERS: string[] = [
   "All",
@@ -30,6 +31,8 @@ export default function MenuPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [activeFilter, setActiveFilter] = useState("All");
+  const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
+  const { data: session } = useSession();
 
   const fetchProducts = useCallback(async (category: string) => {
     setLoading(true);
@@ -75,6 +78,24 @@ export default function MenuPage() {
   useEffect(() => {
     fetchProducts(activeFilter);
   }, [activeFilter, fetchProducts]);
+
+  useEffect(() => {
+    if (session?.user?.role !== "USER") {
+      setFavoriteIds([]);
+      return;
+    }
+    fetch("/api/account/favorites")
+      .then(async (response) => {
+        if (!response.ok) throw new Error("Unable to load saved items.");
+        return response.json();
+      })
+      .then((data) => setFavoriteIds(data.productIds))
+      .catch(() => setFavoriteIds([]));
+  }, [session?.user?.role]);
+
+  const handleFavoriteChange = (productId: string, favorite: boolean) => {
+    setFavoriteIds((current) => favorite ? [...new Set([...current, productId])] : current.filter((id) => id !== productId));
+  };
 
   const handleFilterClick = (filterName: string) => {
     setActiveFilter(filterName);
@@ -153,6 +174,8 @@ export default function MenuPage() {
                     imageUrl={product.imageUrl}
                     description={product.description}
                     price={parseDecimal(product.price)}
+                    isFavorite={favoriteIds.includes(product.id)}
+                    onFavoriteChange={handleFavoriteChange}
                   />
                 ))}
               </div>

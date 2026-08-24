@@ -14,15 +14,15 @@ datasource db {
 }
 
 model User {
-  id            String   @id @default(cuid())
-  name          String?
-  email         String?  @unique
-  emailVerified Boolean?
-  phone         String?
-  image         String?
-  preferences   Json? // e.g., favorite drinks, milk preference
-  isActive      Boolean  @default(true)
-  deactivatedAt DateTime?
+  id              String    @id @default(cuid())
+  name            String?
+  email           String?   @unique
+  emailVerified   Boolean?
+  phone           String?
+  image           String?
+  preferences     Json? // e.g., favorite drinks, milk preference
+  isActive        Boolean   @default(true)
+  deactivatedAt   DateTime?
   deactivatedById String?
 
   role         UserRole      @default(USER)
@@ -32,26 +32,28 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  sessions    Session[]
-  accounts    Account[]
-  auditLogs   AuditLog[]
-  staffStores StaffStoreAssignment[]
+  sessions         Session[]
+  accounts         Account[]
+  auditLogs        AuditLog[]
+  staffStores      StaffStoreAssignment[]
+  favoriteProducts FavoriteProduct[]
 
   @@map("user")
 }
 
 model Product {
-  id          String      @id @default(cuid())
-  name        String      @unique
+  id          String            @id @default(cuid())
+  name        String            @unique
   description String?
-  price       Decimal     @db.Decimal(10, 2)
-  category    Category    @relation(fields: [categoryId], references: [id])
+  price       Decimal           @db.Decimal(10, 2)
+  category    Category          @relation(fields: [categoryId], references: [id])
   categoryId  String
   imageUrl    String?
-  isActive    Boolean     @default(true)
+  isActive    Boolean           @default(true)
   // inventory   Inventory?
   orderItems  OrderItem[]
-  createdAt   DateTime    @default(now())
+  favoritedBy FavoriteProduct[]
+  createdAt   DateTime          @default(now())
 }
 
 model Category {
@@ -62,6 +64,20 @@ model Category {
   products  Product[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+}
+
+model FavoriteProduct {
+  id        String   @id @default(cuid())
+  userId    String
+  productId String
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+  @@index([userId, createdAt])
+  @@index([productId])
 }
 
 model Order {
@@ -137,30 +153,30 @@ model StoreLocation {
 }
 
 model StaffStoreAssignment {
-  id        String        @id @default(cuid())
-  userId    String
-  storeId   String
-  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  store     StoreLocation @relation(fields: [storeId], references: [id], onDelete: Cascade)
-  createdAt DateTime      @default(now())
-  endedAt   DateTime?
-  reason    String?
+  id           String        @id @default(cuid())
+  userId       String
+  storeId      String
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  store        StoreLocation @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  createdAt    DateTime      @default(now())
+  endedAt      DateTime?
+  reason       String?
   assignedById String?
-  endedById String?
+  endedById    String?
 
   @@index([userId, storeId, endedAt])
   @@index([storeId])
 }
 
 model StaffInvitation {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   email       String
   role        UserRole
-  tokenHash   String   @unique
+  tokenHash   String    @unique
   expiresAt   DateTime
   acceptedAt  DateTime?
   createdById String
-  createdAt   DateTime @default(now())
+  createdAt   DateTime  @default(now())
 
   @@index([email])
   @@index([expiresAt])

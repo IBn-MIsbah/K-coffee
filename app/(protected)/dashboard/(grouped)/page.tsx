@@ -4,7 +4,7 @@ import { requirePageSession } from "@/lib/authz";
 import { getCustomerDashboard } from "@/lib/dashboard/customer-dashboard-service";
 import { canCustomerCancel } from "@/lib/orders/customer-service";
 import { UserRole } from "@/lib/rbac";
-import { ArrowRight, CalendarClock, MapPin, ReceiptText } from "lucide-react";
+import { ArrowRight, CalendarClock, Heart, MapPin, ReceiptText } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import CustomerDashboardActions from "./customer-dashboard-actions";
@@ -29,7 +29,7 @@ export default async function CustomerDashboardPage() {
   if (actor.role === UserRole.CASHIER) redirect("/dashboard/cashier");
   if (actor.role !== UserRole.USER) redirect("/unauthorized");
 
-  const { activeOrder, recentOrders } = await getCustomerDashboard(actor);
+  const { activeOrder, recentOrders, favoriteProducts } = await getCustomerDashboard(actor);
   const firstName = actor.name?.trim().split(/\s+/)[0] || "there";
 
   return <section className="mx-auto w-full max-w-6xl">
@@ -66,6 +66,11 @@ export default async function CustomerDashboardPage() {
         <Button asChild variant="ghost" className="mt-5 min-h-11 w-full justify-between text-[#7d4018] hover:bg-[#f7ebd8] hover:text-[#3b2116]"><Link href="/dashboard/orders">View all orders <ArrowRight aria-hidden="true" className="size-4" /></Link></Button>
       </section>
     </div>
+
+    <section aria-labelledby="favorites-heading" className="mt-7 rounded-3xl border border-[#ead9bf] bg-white p-5 shadow-sm sm:p-7">
+      <div className="flex flex-wrap items-center justify-between gap-4"><div><p className="text-xs font-bold uppercase tracking-[.18em] text-[#a56328]">Saved for later</p><h2 id="favorites-heading" className="mt-2 text-xl font-extrabold text-[#2c1911]">Your favourites</h2></div><Heart aria-hidden="true" className="size-5 text-[#a56328]" /></div>
+      {favoriteProducts.length ? <ul className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">{favoriteProducts.map((product) => <li key={product.id}><Link href={`/menu/${product.id}`} className="block h-full rounded-2xl border border-[#ead9bf] p-4 transition-colors hover:bg-[#f7f1e6] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#934817]"><p className="font-bold text-[#3b2116]">{product.name}</p><p className="mt-1 text-sm text-[#725b4c]">ETB {product.price.toFixed(2)}</p><span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-[#7d4018]">View item <ArrowRight aria-hidden="true" className="size-4" /></span></Link></li>)}</ul> : <div className="mt-5 rounded-2xl bg-[#f7f1e6] p-5 text-sm leading-6 text-[#725b4c]">Save menu items with the heart icon and they&apos;ll appear here for quick ordering.</div>}
+    </section>
   </section>;
 }
 

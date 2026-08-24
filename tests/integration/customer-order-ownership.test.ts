@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { afterAll, beforeEach, describe, expect, it } from "vitest";
 import { Prisma } from "@/app/generated/prisma/client";
 import { getCustomerOrder, getCustomerReorderPreview, listCustomerOrders } from "@/lib/orders/customer-service";
+import { addCustomerFavorite, listCustomerFavoriteIds, listCustomerFavoriteProducts, removeCustomerFavorite } from "@/lib/favorites/favorite-service";
 import { parseCustomerOrderHistoryFilters } from "@/lib/orders/customer-order-validation";
 import prisma from "@/lib/prisma";
 import { UserRole } from "@/lib/rbac";
@@ -12,6 +13,7 @@ const secondCustomer = { id: "", email: `${prefix}-second@k-coffee.test`, name: 
 let firstOrderId = "";
 let firstCompletedOrderId = "";
 let secondOrderId = "";
+let productId = "";
 
 async function removeFixtures() {
   await prisma.orderItem.deleteMany({ where: { order: { orderNumber: { startsWith: prefix } } } });
@@ -34,6 +36,7 @@ beforeEach(async () => {
   const store = await prisma.storeLocation.create({ data: { id: `${prefix}-store`, name: "Integration customer store", address: "Addis Ababa", phone: "+251000000000", timezone: "Africa/Addis_Ababa", hours: {} } });
   const category = await prisma.category.create({ data: { name: `${prefix} category`, slug: `${prefix}-category` } });
   const product = await prisma.product.create({ data: { name: `${prefix}-product`, price: new Prisma.Decimal("15"), categoryId: category.id } });
+  productId = product.id;
   const [firstOrder, firstCompletedOrder, secondOrder] = await Promise.all([
     prisma.order.create({ data: { orderNumber: `${prefix}-pending`, userId: firstCustomer.id, storeId: store.id, totalAmount: new Prisma.Decimal("15"), items: { create: { productId: product.id, quantity: 1, price: new Prisma.Decimal("15") } } } }),
     prisma.order.create({ data: { orderNumber: `${prefix}-first-completed`, userId: firstCustomer.id, storeId: store.id, totalAmount: new Prisma.Decimal("30"), status: "COMPLETED", items: { create: { productId: product.id, quantity: 2, price: new Prisma.Decimal("15") } } } }),
@@ -76,5 +79,19 @@ describe("customer order ownership", () => {
       available: [expect.objectContaining({ name: `${prefix}-product`, price: "18", quantity: 2 })],
       unavailable: [],
     });
+  });
+
+  it("keeps favourites private and hides products that are no longer orderable", async () => {
+    await addCustomerFavorite(firstCustomer, productId);
+    await expect(listCustomerFavoriteIds(firstCustomer)).resolves.toEqual([productId]);
+    await expect(listCustomerFavoriteIds(secondCustomer)).resolves.toEqual([]);
+    await expect(listCustomerFavoriteProducts(firstCustomer)).resolves.toEqual([
+      expect.objectContaining({ product: expect.objectContaining({ id: productId }) }),
+    ]);
+
+    await prisma.product.update({ where: { id: productId }, data: { isActive: false } });
+    await expect(listCustomerFavoriteProducts(firstCustomer)).resolves.toEqual([]);
+    await removeCustomerFavorite(firstCustomer, productId);
+    await expect(listCustomerFavoriteIds(firstCustomer)).resolves.toEqual([]);
   });
 });

@@ -2,6 +2,7 @@ import "server-only";
 
 import { type AuthenticatedActor, AuthorizationError } from "@/lib/authz";
 import { UserRole } from "@/lib/rbac";
+import { listCustomerFavoriteProducts } from "@/lib/favorites/favorite-service";
 import prisma from "@/lib/prisma";
 import { customerActiveOrderStatuses, selectActivePickupOrder } from "./customer-dashboard-policy";
 
@@ -21,7 +22,7 @@ const orderSelect = {
 export async function getCustomerDashboard(actor: AuthenticatedActor) {
   if (actor.role !== UserRole.USER) throw new AuthorizationError();
 
-  const [activeCandidates, recentOrders] = await Promise.all([
+  const [activeCandidates, recentOrders, favoriteProducts] = await Promise.all([
     prisma.order.findMany({
       where: { userId: actor.id, status: { in: [...customerActiveOrderStatuses] } },
       orderBy: { createdAt: "desc" },
@@ -34,7 +35,8 @@ export async function getCustomerDashboard(actor: AuthenticatedActor) {
       take: 4,
       select: orderSelect,
     }),
+    listCustomerFavoriteProducts(actor),
   ]);
 
-  return { activeOrder: selectActivePickupOrder(activeCandidates), recentOrders };
+  return { activeOrder: selectActivePickupOrder(activeCandidates), recentOrders, favoriteProducts: favoriteProducts.map((favorite) => favorite.product) };
 }
