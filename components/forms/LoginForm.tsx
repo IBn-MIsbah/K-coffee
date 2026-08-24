@@ -62,9 +62,13 @@ const LoginForm = ({ returnTo }: { returnTo: string }) => {
     <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
       <form onSubmit={handleSubmit} className="p-8">
         <div className="flex items-center gap-3 mb-8">
-          <div className="p-2 bg-amber-50 rounded-lg">
-            <Coffee className="h-6 w-6 text-amber-600" />
-          </div>
+          <Link
+            href="/"
+            aria-label="Return to K-Coffee home"
+            className="grid size-11 shrink-0 place-items-center rounded-xl bg-amber-50 text-amber-700 transition-colors hover:bg-amber-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-700"
+          >
+            <Coffee aria-hidden="true" className="h-6 w-6" />
+          </Link>
           <FieldDescription className="text-xl font-bold text-gray-900">
             K-Coffee Shop
           </FieldDescription>
@@ -86,26 +90,29 @@ const LoginForm = ({ returnTo }: { returnTo: string }) => {
 
           <div className="space-y-6">
             <Field>
-              <FieldLabel htmlFor="email">Email Address</FieldLabel>
-              <Input id="email" name="email" type="email" />
+              <FieldLabel htmlFor="email">Email address</FieldLabel>
+              <Input id="email" name="email" type="email" autoComplete="email" required />
             </Field>
-            <Link href="/forgot-password" className="block text-right text-sm font-semibold text-amber-800 underline">
-              Forgot your password?
-            </Link>
 
             <Field>
-              <FieldLabel htmlFor="password">Password</FieldLabel>
+              <div className="flex items-center justify-between gap-3">
+                <FieldLabel htmlFor="password">Password</FieldLabel>
+                <Link href="/forgot-password" className="rounded text-sm font-semibold text-amber-800 underline underline-offset-4 hover:text-amber-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-700">
+                  Forgot password?
+                </Link>
+              </div>
               <div className="relative">
                 <Input
                   id="password"
                   name="password"
                   type={showPassword ? "text" : "password"}
+                  autoComplete="current-password"
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+                  className="absolute right-1 top-1/2 grid size-11 -translate-y-1/2 place-items-center rounded-md text-gray-500 hover:bg-amber-50 hover:text-amber-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-700"
                   aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? (
