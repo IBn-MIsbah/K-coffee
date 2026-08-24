@@ -1,5 +1,5 @@
+import "dotenv/config";
 import { hashPassword } from "better-auth/crypto";
-import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { initializePermissions, UserRole } from "@/lib/rbac";
 import { requiredEnvironment, requireProductionEnvironment } from "./production-env";
@@ -83,9 +83,10 @@ async function main() {
   });
 
   if (!existingAdmin) {
-    await auth.api.signUpEmail({
-      body: { email: adminEmail, name: adminName, password: adminPassword },
+    const user = await prisma.user.create({
+      data: { id: crypto.randomUUID(), email: adminEmail, name: adminName, role: UserRole.SUPERADMIN, emailVerified: true },
     });
+    await prisma.account.create({ data: { id: crypto.randomUUID(), issuer: "local:credential", accountId: user.id, providerId: "credential", userId: user.id, password: await hashPassword(adminPassword) } });
   } else if (!existingAdmin.accounts.some((account) => account.providerId === "credential")) {
     await prisma.account.create({
       data: {
