@@ -1,7 +1,7 @@
 import PopularItemsCard from "@/components/Home/componenets/PopularItemsCard";
 import { PopularItemsCardSkeleton } from "@/components/Home/skeloton/PopularItemsCardSkeloton";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Coffee, MapPin, Quote, Star } from "lucide-react";
+import { ArrowRight, Coffee, MapPin } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
 import { getCurrentActor } from "@/lib/authz";
@@ -66,59 +66,75 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-5 py-16 sm:px-8 lg:px-12 lg:py-24">
-        <div className="grid gap-16 lg:grid-cols-[1.45fr_.9fr] lg:gap-20">
-          <div>
-            <div className="mb-9 flex items-end justify-between gap-5">
-              <div>
-                <p className="text-xs font-bold uppercase tracking-[.22em] text-[#a56328]">
-                  Made with care
-                </p>
-                <h2 className="mt-3 text-3xl font-extrabold tracking-[-.035em] text-[#2c1911] sm:text-4xl">
-                  Popular menu items
-                </h2>
-              </div>
-              <Link
-                href="/menu"
-                className="hidden items-center gap-1 text-sm font-bold text-[#8d4d20] underline-offset-4 hover:underline sm:flex"
-              >
-                Full menu <ArrowRight aria-hidden="true" className="size-4" />
-              </Link>
+      <section className="relative isolate overflow-hidden border-y border-[#e7d2b2] bg-[#fff8ed]">
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute -left-32 top-12 size-80 rounded-full bg-[#f1c982]/20 blur-3xl" />
+          <div className="absolute -right-24 bottom-0 size-96 rounded-full bg-[#bd6b31]/10 blur-3xl" />
+        </div>
+        <div className="relative mx-auto max-w-7xl px-5 py-16 sm:px-8 sm:py-20 lg:px-12 lg:py-24">
+          <div className="flex flex-col gap-7 border-b border-[#e4cfaf] pb-10 sm:pb-12 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-2xl">
+              <p className="text-xs font-bold uppercase tracking-[.22em] text-[#a56328]">
+                Made for pickup
+              </p>
+              <h2 className="mt-3 text-balance text-3xl font-extrabold tracking-[-.04em] text-[#2c1911] sm:text-4xl lg:text-5xl">
+                Menu picks for your next pause.
+              </h2>
+              <p className="mt-4 max-w-xl text-pretty leading-7 text-[#745d4e]">
+                A few easy places to start—made to order, ready for your chosen pickup time, and paid for when you arrive.
+              </p>
             </div>
+            <Button
+              asChild
+              className="min-h-12 shrink-0 rounded-full bg-[#3b2116] px-6 font-bold text-[#fff9ee] hover:bg-[#5a3020]"
+            >
+              <Link href="/menu">
+                Browse full menu <ArrowRight aria-hidden="true" className="size-4" />
+              </Link>
+            </Button>
+          </div>
+
+          <div className="mt-10 grid gap-7 xl:grid-cols-[minmax(0,1fr)_18.5rem] xl:items-stretch">
             <Suspense fallback={<PopularItemsCardSkeleton />}>
               <PopularItemsCard />
             </Suspense>
-            <Link
-              href="/menu"
-              className="mt-8 inline-flex items-center gap-1 text-sm font-bold text-[#8d4d20] underline-offset-4 hover:underline sm:hidden"
-            >
-              Browse the full menu{" "}
-              <ArrowRight aria-hidden="true" className="size-4" />
-            </Link>
+
+            <aside className="relative overflow-hidden rounded-[1.75rem] bg-[#3b2116] p-7 text-[#fff9ee] shadow-[0_20px_45px_rgba(76,37,15,.18)] sm:p-8 xl:flex xl:flex-col">
+              <div aria-hidden="true" className="absolute -right-14 -top-12 size-52 rounded-full border border-[#f8dca8]/20 bg-[#d9934c]/15" />
+              <div aria-hidden="true" className="absolute -bottom-20 -left-12 size-48 rounded-full bg-[#f0bd71]/10 blur-2xl" />
+              <div className="relative">
+                <span className="inline-flex rounded-full border border-[#f8dca8]/25 bg-white/5 px-3 py-1 text-xs font-bold uppercase tracking-[.16em] text-[#f8dca8]">
+                  Your pickup rhythm
+                </span>
+                <h3 className="mt-5 text-2xl font-extrabold leading-8 tracking-[-.03em]">
+                  Great coffee, right on time.
+                </h3>
+                <p className="mt-3 text-sm leading-6 text-[#f7e7cb]/75">
+                  Select the slot that works for you, then collect your order and pay at the counter.
+                </p>
+              </div>
+              <dl className="relative mt-8 grid gap-3 border-y border-white/10 py-5">
+                <div className="flex items-center gap-3">
+                  <dt className="grid size-10 shrink-0 place-items-center rounded-xl bg-[#f2bc6d] text-sm font-extrabold text-[#3b2116]">
+                    20
+                  </dt>
+                  <dd className="text-sm font-semibold text-[#fff4df]">Minute pickup intervals</dd>
+                </div>
+                <div className="flex items-center gap-3">
+                  <dt className="grid size-10 shrink-0 place-items-center rounded-xl bg-white/10 text-[#f8dca8]">
+                    <Coffee aria-hidden="true" className="size-4" />
+                  </dt>
+                  <dd className="text-sm font-semibold text-[#fff4df]">Pay at pickup</dd>
+                </div>
+              </dl>
+              <Link
+                href="/locations"
+                className="relative mt-6 inline-flex min-h-11 items-center gap-2 self-start text-sm font-bold text-[#f8dca8] underline-offset-4 hover:text-white hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#f8dca8] xl:mt-auto"
+              >
+                Find a pickup location <ArrowRight aria-hidden="true" className="size-4" />
+              </Link>
+            </aside>
           </div>
-          <aside className="self-center rounded-[1.75rem] border border-[#ead9bf] bg-[#fffaf0] p-7 shadow-[0_18px_45px_rgba(88,49,22,.10)] sm:p-9">
-            <Quote aria-hidden="true" className="size-8 text-[#d78b35]" />
-            <p className="mt-5 text-xl font-semibold leading-8 tracking-[-.02em] text-[#432519]">
-              “This isn&apos;t just a coffee shop — it&apos;s the calmest part
-              of my morning.”
-            </p>
-            <div
-              className="mt-7 flex items-center gap-1 text-[#e5a137]"
-              aria-label="Five star review"
-            >
-              {Array.from({ length: 5 }, (_, index) => (
-                <Star
-                  key={index}
-                  aria-hidden="true"
-                  className="size-4 fill-current"
-                />
-              ))}
-            </div>
-            <div className="mt-5 border-t border-[#ead9bf] pt-5">
-              <p className="font-bold text-[#442619]">Sara A.</p>
-              <p className="mt-1 text-sm text-[#7b604e]">Regular since 2021</p>
-            </div>
-          </aside>
         </div>
       </section>
 
