@@ -11,7 +11,7 @@ const inviteSchema = z.object({
   role: z.enum(["CASHIER", "ADMIN"]),
 });
 
-type StaffUser = { id: string; name: string; role: string; stores: string[] };
+type StaffUser = { id: string; name: string; role: string; stores: string[]; privacyManager: boolean };
 
 export default function StaffDirectory({ users }: { users: StaffUser[] }) {
   const router = useRouter();
@@ -48,6 +48,13 @@ export default function StaffDirectory({ users }: { users: StaffUser[] }) {
     } finally {
       setBusy(null);
     }
+  }
+  async function updatePrivacyAccess(user: StaffUser) {
+    setBusy(`privacy-${user.id}`);
+    const response = await fetch(`/api/admin/staff/${user.id}/privacy-access`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ enabled: !user.privacyManager }) });
+    const data = await response.json();
+    if (!response.ok) toast.error(data.error ?? "Unable to update privacy access."); else { toast.success(user.privacyManager ? "Privacy access revoked." : "Privacy access granted."); router.refresh(); }
+    setBusy(null);
   }
 
   async function invite(event: React.FormEvent<HTMLFormElement>) {
@@ -104,7 +111,7 @@ export default function StaffDirectory({ users }: { users: StaffUser[] }) {
 
     {error && <p className="mt-4 text-red-700" role="alert">{error}</p>}
     <div className="mt-6 divide-y rounded-2xl border bg-white">
-      {users.map((user) => <article key={user.id} className="flex flex-wrap items-center justify-between gap-4 p-4"><div><h2 className="font-semibold text-amber-950">{user.name}</h2><p className="text-sm text-slate-600">Stores: {user.stores.join(", ") || "No store assignment"}</p></div><label className="sr-only" htmlFor={`role-${user.id}`}>Role for {user.name}</label><select id={`role-${user.id}`} defaultValue={user.role} disabled={busy === user.id} onChange={(event) => update(user.id, event.target.value)} className="min-h-11 rounded-lg border px-3"><option value={user.role}>{user.role}</option>{roles.filter((role) => role !== user.role).map((role) => <option key={role}>{role}</option>)}</select></article>)}
+      {users.map((user) => <article key={user.id} className="flex flex-wrap items-center justify-between gap-4 p-4"><div><h2 className="font-semibold text-amber-950">{user.name}</h2><p className="text-sm text-slate-600">Stores: {user.stores.join(", ") || "No store assignment"}</p></div><div className="flex flex-wrap items-center gap-2">{user.role === "ADMIN" && <button type="button" disabled={busy !== null} onClick={() => updatePrivacyAccess(user)} className="min-h-11 rounded-lg border border-amber-300 px-3 text-sm font-semibold text-amber-900 hover:bg-amber-50">{busy === `privacy-${user.id}` ? "Saving…" : user.privacyManager ? "Revoke privacy access" : "Grant privacy access"}</button>}<label className="sr-only" htmlFor={`role-${user.id}`}>Role for {user.name}</label><select id={`role-${user.id}`} defaultValue={user.role} disabled={busy === user.id} onChange={(event) => update(user.id, event.target.value)} className="min-h-11 rounded-lg border px-3"><option value={user.role}>{user.role}</option>{roles.filter((role) => role !== user.role).map((role) => <option key={role}>{role}</option>)}</select></div></article>)}
     </div>
   </section>;
 }

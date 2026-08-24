@@ -1,30 +1,18 @@
 "use client";
+
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { usePathname } from "next/navigation";
-const labels: Record<string, string> = {
-  "/dashboard": "Customer home",
-  "/dashboard/admin": "Admin overview",
-  "/dashboard/admin/orders": "Order operations",
-  "/dashboard/cashier": "Pickup queue",
-  "/dashboard/profile": "Profile",
-  "/dashboard/orders": "My orders",
-  "/dashboard/notifications": "Notifications",
-  "/dashboard/admin/staff": "Staff access",
-  "/dashboard/admin/audit": "Audit log",
-};
+import { signOut, useSession } from "@/lib/auth-client";
+import { Bell, ChevronDown, CircleUserRound, Coffee, LogOut, ReceiptText } from "lucide-react";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { useState } from "react";
+
+const labels: Record<string, string> = { "/dashboard": "Customer home", "/dashboard/admin": "Admin overview", "/dashboard/admin/orders": "Order operations", "/dashboard/cashier": "Pickup queue", "/dashboard/profile": "Profile", "/dashboard/orders": "My orders", "/dashboard/notifications": "Notifications", "/dashboard/admin/staff": "Staff access", "/dashboard/admin/audit": "Audit log" };
+
 export default function DashboardHeader() {
-  const path = usePathname();
-  return (
-    <header className="flex min-h-16 items-center gap-4 border-b border-[#ead9bf] bg-[#fffaf0] px-4 sm:px-6">
-      <SidebarTrigger aria-label="Toggle navigation" />
-      <div>
-        <p className="text-xs font-bold uppercase tracking-[.16em] text-[#a56328]">
-          K-Coffee
-        </p>
-        <h1 className="text-base font-extrabold text-[#2c1911]">
-          {labels[path] ?? "K-Coffee dashboard"}
-        </h1>
-      </div>
-    </header>
-  );
+  const path = usePathname(); const router = useRouter(); const { data: session } = useSession(); const [isSigningOut, setIsSigningOut] = useState(false);
+  const name = session?.user?.name ?? session?.user?.email ?? "K-Coffee account"; const role = session?.user?.role;
+  async function handleSignOut() { setIsSigningOut(true); const result = await signOut(); if (!result.error) { router.push("/"); router.refresh(); } setIsSigningOut(false); }
+  return <header className="sticky top-0 z-20 border-b border-white/45 bg-[#fffaf0]/70 px-4 py-3 backdrop-blur-xl sm:px-6"><div className="mx-auto flex min-h-12 max-w-[112rem] items-center justify-between gap-3"><div className="flex min-w-0 items-center gap-3"><SidebarTrigger aria-label="Toggle navigation" className="size-11 rounded-2xl border border-[#e9d6b8]/80 bg-white/70 text-[#5f3822] shadow-sm transition-transform hover:scale-[1.03] hover:bg-white" /><div className="hidden size-10 place-items-center rounded-2xl bg-[#3b2116] text-[#f4bd4d] shadow-[0_10px_24px_rgba(59,33,22,.2)] sm:grid"><Coffee aria-hidden="true" className="size-5" /></div><div className="min-w-0"><p className="text-[11px] font-bold uppercase tracking-[.2em] text-[#a56328]">K-Coffee workspace</p><h1 className="truncate text-base font-extrabold tracking-[-.02em] text-[#2c1911]">{labels[path] ?? "K-Coffee dashboard"}</h1></div></div><DropdownMenu><DropdownMenuTrigger asChild><button type="button" className="group flex min-h-11 items-center gap-2 rounded-2xl border border-white/75 bg-white/70 py-1.5 pr-2 pl-1.5 text-left shadow-sm transition hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#934817]"><span className="grid size-8 place-items-center rounded-xl bg-[#f5dfba] text-sm font-extrabold text-[#7d4018]">{name.trim().slice(0, 1).toUpperCase()}</span><span className="hidden max-w-36 min-w-0 sm:block"><span className="block truncate text-sm font-bold text-[#3b2116]">{name}</span><span className="block text-[11px] font-semibold uppercase tracking-[.12em] text-[#946642]">{role?.replaceAll("_", " ") ?? "Account"}</span></span><ChevronDown aria-hidden="true" className="size-4 text-[#8a654d] transition-transform group-data-[state=open]:rotate-180" /></button></DropdownMenuTrigger><DropdownMenuContent align="end" className="w-64 rounded-2xl border-[#ead9bf] bg-[#fffaf0]/95 p-2 shadow-[0_18px_46px_rgba(59,33,22,.2)] backdrop-blur-xl"><DropdownMenuLabel className="px-3 py-2"><p className="truncate text-sm font-bold text-[#3b2116]">{name}</p><p className="truncate pt-0.5 text-xs font-normal text-[#725b4c]">{session?.user?.email}</p></DropdownMenuLabel><DropdownMenuSeparator className="bg-[#ead9bf]" /><DropdownMenuGroup><DropdownMenuItem asChild className="rounded-xl text-[#51301f] focus:bg-[#f5dfba]"><Link href="/dashboard/profile"><CircleUserRound aria-hidden="true" className="size-4" />Profile</Link></DropdownMenuItem>{role === "USER" && <><DropdownMenuItem asChild className="rounded-xl text-[#51301f] focus:bg-[#f5dfba]"><Link href="/dashboard/notifications"><Bell aria-hidden="true" className="size-4" />Notifications</Link></DropdownMenuItem><DropdownMenuItem asChild className="rounded-xl text-[#51301f] focus:bg-[#f5dfba]"><Link href="/dashboard/orders"><ReceiptText aria-hidden="true" className="size-4" />Order history</Link></DropdownMenuItem></>}</DropdownMenuGroup><DropdownMenuSeparator className="bg-[#ead9bf]" /><DropdownMenuItem disabled={isSigningOut} onSelect={(event) => { event.preventDefault(); void handleSignOut(); }} variant="destructive" className="rounded-xl focus:bg-red-50"><LogOut aria-hidden="true" className="size-4" />{isSigningOut ? "Signing out…" : "Sign out"}</DropdownMenuItem></DropdownMenuContent></DropdownMenu></div></header>;
 }

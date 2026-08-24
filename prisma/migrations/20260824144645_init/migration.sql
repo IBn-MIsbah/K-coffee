@@ -11,6 +11,15 @@ CREATE TYPE "PaymentStatus" AS ENUM ('PENDING', 'PAID', 'VOID');
 CREATE TYPE "ReservationStatus" AS ENUM ('CONFIRMED', 'SEATED', 'COMPLETED', 'CANCELLED', 'NO_SHOW');
 
 -- CreateEnum
+CREATE TYPE "NotificationEvent" AS ENUM ('ORDER_RECEIVED', 'ORDER_READY', 'ORDER_CANCELLED');
+
+-- CreateEnum
+CREATE TYPE "NotificationChannel" AS ENUM ('EMAIL');
+
+-- CreateEnum
+CREATE TYPE "NotificationDeliveryStatus" AS ENUM ('PENDING', 'SENT', 'FAILED');
+
+-- CreateEnum
 CREATE TYPE "UserRole" AS ENUM ('SUPERADMIN', 'ADMIN', 'USER', 'CASHIER');
 
 -- CreateTable
@@ -56,6 +65,52 @@ CREATE TABLE "Category" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Category_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "FavoriteProduct" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "productId" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "FavoriteProduct_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "AppNotification" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "orderId" TEXT,
+    "event" "NotificationEvent" NOT NULL,
+    "title" TEXT NOT NULL,
+    "body" TEXT NOT NULL,
+    "href" TEXT,
+    "readAt" TIMESTAMP(3),
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "productId" TEXT,
+
+    CONSTRAINT "AppNotification_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "NotificationDelivery" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "orderId" TEXT,
+    "event" "NotificationEvent" NOT NULL,
+    "channel" "NotificationChannel" NOT NULL DEFAULT 'EMAIL',
+    "recipient" TEXT NOT NULL,
+    "status" "NotificationDeliveryStatus" NOT NULL DEFAULT 'PENDING',
+    "providerMessageId" TEXT,
+    "attemptCount" INTEGER NOT NULL DEFAULT 0,
+    "errorCode" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "sentAt" TIMESTAMP(3),
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "productId" TEXT,
+
+    CONSTRAINT "NotificationDelivery_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -153,6 +208,19 @@ CREATE TABLE "StaffInvitation" (
 );
 
 -- CreateTable
+CREATE TABLE "UserPermissionGrant" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "permission" TEXT NOT NULL,
+    "grantedById" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "revokedAt" TIMESTAMP(3),
+    "revokedById" TEXT,
+
+    CONSTRAINT "UserPermissionGrant_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "session" (
     "id" TEXT NOT NULL,
     "expiresAt" TIMESTAMP(3) NOT NULL,
@@ -237,6 +305,30 @@ CREATE UNIQUE INDEX "Product_name_key" ON "Product"("name");
 CREATE UNIQUE INDEX "Category_slug_key" ON "Category"("slug");
 
 -- CreateIndex
+CREATE INDEX "FavoriteProduct_userId_createdAt_idx" ON "FavoriteProduct"("userId", "createdAt");
+
+-- CreateIndex
+CREATE INDEX "FavoriteProduct_productId_idx" ON "FavoriteProduct"("productId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "FavoriteProduct_userId_productId_key" ON "FavoriteProduct"("userId", "productId");
+
+-- CreateIndex
+CREATE INDEX "AppNotification_userId_readAt_createdAt_idx" ON "AppNotification"("userId", "readAt", "createdAt");
+
+-- CreateIndex
+CREATE INDEX "AppNotification_orderId_idx" ON "AppNotification"("orderId");
+
+-- CreateIndex
+CREATE INDEX "NotificationDelivery_userId_createdAt_idx" ON "NotificationDelivery"("userId", "createdAt");
+
+-- CreateIndex
+CREATE INDEX "NotificationDelivery_status_createdAt_idx" ON "NotificationDelivery"("status", "createdAt");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "NotificationDelivery_orderId_event_channel_key" ON "NotificationDelivery"("orderId", "event", "channel");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Order_orderNumber_key" ON "Order"("orderNumber");
 
 -- CreateIndex
@@ -273,6 +365,12 @@ CREATE INDEX "StaffInvitation_email_idx" ON "StaffInvitation"("email");
 CREATE INDEX "StaffInvitation_expiresAt_idx" ON "StaffInvitation"("expiresAt");
 
 -- CreateIndex
+CREATE INDEX "UserPermissionGrant_userId_permission_revokedAt_idx" ON "UserPermissionGrant"("userId", "permission", "revokedAt");
+
+-- CreateIndex
+CREATE INDEX "UserPermissionGrant_permission_revokedAt_idx" ON "UserPermissionGrant"("permission", "revokedAt");
+
+-- CreateIndex
 CREATE INDEX "session_userId_idx" ON "session"("userId");
 
 -- CreateIndex
@@ -303,6 +401,30 @@ CREATE INDEX "audit_log_createdAt_idx" ON "audit_log"("createdAt");
 ALTER TABLE "Product" ADD CONSTRAINT "Product_categoryId_fkey" FOREIGN KEY ("categoryId") REFERENCES "Category"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "FavoriteProduct" ADD CONSTRAINT "FavoriteProduct_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "FavoriteProduct" ADD CONSTRAINT "FavoriteProduct_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "AppNotification" ADD CONSTRAINT "AppNotification_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "AppNotification" ADD CONSTRAINT "AppNotification_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "Order"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "AppNotification" ADD CONSTRAINT "AppNotification_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "NotificationDelivery" ADD CONSTRAINT "NotificationDelivery_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "NotificationDelivery" ADD CONSTRAINT "NotificationDelivery_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "Order"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "NotificationDelivery" ADD CONSTRAINT "NotificationDelivery_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "Order" ADD CONSTRAINT "Order_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -325,6 +447,12 @@ ALTER TABLE "StaffStoreAssignment" ADD CONSTRAINT "StaffStoreAssignment_userId_f
 
 -- AddForeignKey
 ALTER TABLE "StaffStoreAssignment" ADD CONSTRAINT "StaffStoreAssignment_storeId_fkey" FOREIGN KEY ("storeId") REFERENCES "StoreLocation"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "UserPermissionGrant" ADD CONSTRAINT "UserPermissionGrant_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "UserPermissionGrant" ADD CONSTRAINT "UserPermissionGrant_grantedById_fkey" FOREIGN KEY ("grantedById") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "session" ADD CONSTRAINT "session_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;

@@ -57,3 +57,11 @@ export function sendVerificationEmail(to: string, url: string) {
 export function sendOrderNotificationEmail(to: string, subject: string, text: string) {
   return sendAuthEmail({ to, subject, text });
 }
+
+export function sendChangeEmailConfirmationEmail(to: string, newEmail: string, url: string) {
+  return sendAuthEmail({
+    to,
+    subject: "Confirm your K-Coffee email change",
+    text: `We received a request to change your K-Coffee sign-in email to ${newEmail}. Confirm this change using the link below:\n\n${url}\n\nIf you did not request this change, you can safely ignore this email.`,
+  });
+}

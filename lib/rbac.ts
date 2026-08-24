@@ -8,6 +8,8 @@ export enum UserRole {
   CASHIER = "CASHIER",
 }
 
+export const PRIVACY_MANAGE_PERMISSION = "privacy:manage";
+
 export type PermissionAction =
   | "create"
   | "read"
@@ -143,6 +145,15 @@ export async function hasPermission({
   });
 
   return permission?.allowedRoles.includes(userRole) ?? false;
+}
+
+export async function hasPrivacyManagePermission(userId: string, userRole: UserRole) {
+  if (userRole === UserRole.SUPERADMIN) return true;
+  if (userRole !== UserRole.ADMIN) return false;
+  return Boolean(await prisma.userPermissionGrant.findFirst({
+    where: { userId, permission: PRIVACY_MANAGE_PERMISSION, revokedAt: null },
+    select: { id: true },
+  }));
 }
 
 export async function logAudit(

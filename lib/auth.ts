@@ -2,7 +2,11 @@ import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import prisma from "./prisma";
 import { nextCookies } from "better-auth/next-js";
-import { sendPasswordResetEmail, sendVerificationEmail } from "./email";
+import {
+  sendChangeEmailConfirmationEmail,
+  sendPasswordResetEmail,
+  sendVerificationEmail,
+} from "./email";
 
 function trustedOriginFromEnvironment() {
   const candidates = [
@@ -70,6 +74,16 @@ export const auth = betterAuth({
   },
   plugins: [nextCookies()],
   user: {
+    changeEmail: {
+      enabled: true,
+      sendChangeEmailConfirmation: async ({ user, newEmail, url }) => {
+        void sendChangeEmailConfirmationEmail(user.email, newEmail, url).catch(
+          (error) => {
+            console.error("Unable to send email-change confirmation", error);
+          },
+        );
+      },
+    },
     additionalFields: {
       role: {
         type: "string",

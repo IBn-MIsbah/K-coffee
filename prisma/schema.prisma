@@ -39,6 +39,8 @@ model User {
   favoriteProducts       FavoriteProduct[]
   notifications          AppNotification[]
   notificationDeliveries NotificationDelivery[]
+  permissionGrants      UserPermissionGrant[] @relation("PermissionGrantee")
+  grantedPermissions    UserPermissionGrant[] @relation("PermissionGrantor")
 
   @@map("user")
 }
@@ -231,6 +233,22 @@ model StaffInvitation {
 
   @@index([email])
   @@index([expiresAt])
+}
+
+model UserPermissionGrant {
+  id          String   @id @default(cuid())
+  userId      String
+  permission  String
+  grantedById String
+  createdAt   DateTime @default(now())
+  revokedAt   DateTime?
+  revokedById String?
+
+  user      User @relation("PermissionGrantee", fields: [userId], references: [id], onDelete: Cascade)
+  grantedBy User @relation("PermissionGrantor", fields: [grantedById], references: [id], onDelete: Restrict)
+
+  @@index([userId, permission, revokedAt])
+  @@index([permission, revokedAt])
 }
 
 enum OrderStatus {
