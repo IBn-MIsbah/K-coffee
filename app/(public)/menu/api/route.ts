@@ -1,63 +1,34 @@
-import prisma from "@/lib/prisma";
+import { getPublicMenuCatalogue, parseMenuFilters } from "@/lib/menu/public-catalogue";
 import { NextRequest, NextResponse } from "next/server";
 
-export const GET = async (req: NextRequest) => {
-  const searchParams = req.nextUrl.searchParams;
-  const categoryFilter = searchParams.get("category");
-  const nameFilter = searchParams.get("name");
-
-  const whereClause: {
-    isActive: boolean;
-    category?: { isActive: boolean; name?: { contains: string; mode: "insensitive" } };
-    name?: { contains: string; mode: "insensitive" };
-  } = { isActive: true, category: { isActive: true } };
-
-  if (categoryFilter) {
-    whereClause.category = {
-      isActive: true,
-      name: {
-        contains: categoryFilter,
-        mode: "insensitive",
-      },
-    };
-  }
-
-  if (nameFilter) {
-    whereClause.name = {
-      contains: nameFilter,
-      mode: "insensitive",
-    };
-  }
+export async function GET(request: NextRequest) {
+  const searchParams = request.nextUrl.searchParams;
 
   try {
-    const products = await prisma.product.findMany({
-      where: whereClause,
-
-      include: {
-        category: true,
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
+    const filters = parseMenuFilters({
+      category: searchParams.getAll("category"),
+      q: searchParams.getAll("q"),
+      sort: searchParams.getAll("sort"),
+      page: searchParams.getAll("page"),
     });
-    return NextResponse.json(
-      {
-        success: true,
-        data: products,
-        count: products.length,
-      },
-      { status: 200 }
-    );
+    const catalogue = await getPublicMenuCatalogue(filters);
+
+    return NextResponse.json({
+      success: true,
+      data: catalogue.products,
+      categories: catalogue.categories,
+      count: catalogue.total,
+      pageSize: catalogue.pageSize,
+      filters: catalogue.filters,
+    });
   } catch (error) {
-    console.log("Error fetching products: ", error);
+    console.error("Unable to load the public menu catalogue.", error);
     return NextResponse.json(
       {
         success: false,
-        message: "Failed to retrive products due to a server error",
-        error:
-          error instanceof Error ? error.message : "An unknown error occurred",
+        message: "The menu could not be loaded. Please try again shortly.",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
-};
+}

@@ -2,28 +2,19 @@ import { Skeleton } from "../ui/skeleton";
 
 const MenuItemSkeleton = () => {
   return (
-    <div className="p-5 border-0 bg-amber-100 rounded-lg shadow-sm">
-      {/* Image skeleton */}
-      <Skeleton className="h-64 w-full rounded-lg mb-4" />
-
-      <div className="space-y-3">
-        {/* Name skeleton */}
-        <Skeleton className="h-7 w-3/4 rounded-md bg-amber-200" />
-
-        {/* Description skeleton */}
-        <div className="space-y-2">
-          <Skeleton className="h-4 w-full rounded bg-amber-200" />
-          <Skeleton className="h-4 w-4/5 rounded bg-amber-200" />
-          <Skeleton className="h-4 w-3/5 rounded bg-amber-200" />
+    <div className="overflow-hidden rounded-[1.5rem] border border-[#e5cfad] bg-[#fffdf8] shadow-[0_14px_35px_rgba(76,37,15,.08)]">
+      <Skeleton className="aspect-[4/3] w-full rounded-none bg-[#ead8bd]" />
+      <div className="space-y-3 p-5">
+        <div className="flex justify-between gap-4">
+          <Skeleton className="h-6 w-2/5 bg-[#ead8bd]" />
+          <Skeleton className="h-5 w-16 bg-[#ead8bd]" />
         </div>
-
-        {/* Price skeleton */}
-        <Skeleton className="h-6 w-20 rounded bg-amber-200" />
+        <Skeleton className="h-4 w-full bg-[#ead8bd]" />
+        <Skeleton className="h-4 w-3/4 bg-[#ead8bd]" />
       </div>
-
-      {/* Button skeleton */}
-      <div className="mt-4 pt-4 border-t border-amber-300/50">
-        <Skeleton className="h-10 w-full rounded-full bg-amber-500/30" />
+      <div className="flex gap-2 px-5 pb-5">
+        <Skeleton className="h-11 flex-1 rounded-xl bg-[#ead8bd]" />
+        <Skeleton className="size-11 rounded-xl bg-[#ead8bd]" />
       </div>
     </div>
   );

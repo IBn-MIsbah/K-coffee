@@ -1,10 +1,10 @@
 "use client";
 
+import { AddToCartButton } from "@/components/menu/AddToCartButton";
+import { ProductVisual } from "@/components/menu/ProductVisual";
 import { Button } from "@/components/ui/button";
-import { Card, CardDescription, CardTitle } from "@/components/ui/card";
-import { useCart } from "@/lib/store/useCart";
 import { useSession } from "@/lib/auth-client";
-import { Coffee, Heart, Plus } from "lucide-react";
+import { ArrowUpRight, Heart } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -13,63 +13,33 @@ import { toast } from "sonner";
 interface MenuItemsProps {
   id: string;
   name: string;
+  category: string;
   description?: string | null;
   imageUrl: string | null;
   price: number;
+  href?: string;
+  visualIndex?: number;
   isFavorite?: boolean;
+  showFavorite?: boolean;
   onFavoriteChange?: (productId: string, isFavorite: boolean) => void;
 }
 
 const MenuItems = ({
   id,
   name,
+  category,
   description,
   price,
   imageUrl,
+  href = `/menu/${id}`,
+  visualIndex = 0,
   isFavorite = false,
+  showFavorite = true,
   onFavoriteChange,
 }: MenuItemsProps) => {
-  const addItem = useCart((state) => state.addItem);
   const router = useRouter();
   const { data: session, isPending } = useSession();
   const [savingFavorite, setSavingFavorite] = useState(false);
-
-  const addToCart = async () => {
-    const role = session?.user?.role;
-    if (!session?.user) {
-      router.push("/login?callbackUrl=%2Fcart");
-      return;
-    }
-    if (role === "CASHIER") {
-      router.push("/pos");
-      return;
-    }
-    if (role === "ADMIN" || role === "SUPERADMIN") {
-      router.push("/dashboard/admin");
-      return;
-    }
-    if (role !== "USER") {
-      toast.error("Your account cannot use the customer cart.");
-      return;
-    }
-
-    const authorization = await fetch("/api/cart/authorize", {
-      method: "POST",
-    });
-    if (!authorization.ok) {
-      toast.error(
-        "Your cart session could not be verified. Please sign in again.",
-      );
-      router.push("/login?callbackUrl=%2Fcart");
-      return;
-    }
-
-    addItem({ productId: id, name, price, imageUrl });
-    toast.success(`${name} added to your cart`, {
-      description: `ETB ${price.toFixed(2)}`,
-      action: { label: "View cart", onClick: () => router.push("/cart") },
-    });
-  };
 
   const toggleFavorite = async () => {
     const role = session?.user?.role;
@@ -92,77 +62,92 @@ const MenuItems = ({
 
     setSavingFavorite(true);
     try {
-      const response = await fetch(isFavorite ? `/api/account/favorites/${id}` : "/api/account/favorites", {
-        method: isFavorite ? "DELETE" : "POST",
-        headers: isFavorite ? undefined : { "Content-Type": "application/json" },
-        body: isFavorite ? undefined : JSON.stringify({ productId: id }),
-      });
+      const response = await fetch(
+        isFavorite ? `/api/account/favorites/${id}` : "/api/account/favorites",
+        {
+          method: isFavorite ? "DELETE" : "POST",
+          headers: isFavorite ? undefined : { "Content-Type": "application/json" },
+          body: isFavorite ? undefined : JSON.stringify({ productId: id }),
+        },
+      );
       const data = response.status === 204 ? null : await response.json();
-      if (!response.ok) throw new Error(data?.error ?? "Unable to update saved items.");
+      if (!response.ok) {
+        throw new Error(data?.error ?? "Unable to update saved items.");
+      }
 
       onFavoriteChange?.(id, !isFavorite);
-      toast.success(isFavorite ? "Removed from favourites" : "Saved to favourites", { description: name });
+      toast.success(isFavorite ? "Removed from saved items" : "Saved for later", {
+        description: name,
+      });
     } catch (error) {
-      toast.error("Saved items were not updated", { description: error instanceof Error ? error.message : "Try again shortly." });
+      toast.error("Saved items were not updated", {
+        description: error instanceof Error ? error.message : "Try again shortly.",
+      });
     } finally {
       setSavingFavorite(false);
     }
   };
 
   return (
-    <Card className="group flex h-full flex-col border-0 bg-amber-100 p-5 transition-[box-shadow,transform] duration-300 hover:-translate-y-1 hover:bg-amber-50 hover:shadow-xl motion-reduce:transform-none motion-reduce:transition-none">
+    <article className="group flex h-full min-w-0 flex-col overflow-hidden rounded-[1.5rem] border border-[#e5cfad] bg-[#fffdf8] shadow-[0_14px_35px_rgba(76,37,15,.08)] transition-[box-shadow,transform] duration-300 hover:-translate-y-1 hover:shadow-[0_22px_45px_rgba(76,37,15,.15)] motion-reduce:transform-none motion-reduce:transition-none">
       <Link
-        href={`/menu/${id}`}
-        className="block rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-700 focus-visible:ring-offset-2"
+        href={href}
+        className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#9b5828]"
       >
-        <div className="relative mb-4 aspect-4/3 overflow-hidden rounded-lg bg-amber-200/50">
-          {imageUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              className="size-full object-cover transition-transform duration-500 group-hover:scale-105 motion-reduce:transition-none"
-              src={imageUrl}
-              alt={name}
-            />
-          ) : (
-            <div className="grid size-full place-items-center text-amber-700/60">
-              <Coffee aria-hidden="true" className="size-12" />
-            </div>
-          )}
+        <div className="relative aspect-[4/3] overflow-hidden">
+          <ProductVisual
+            imageUrl={imageUrl}
+            index={visualIndex}
+            className="absolute inset-0"
+          />
+          <span className="absolute left-4 top-4 rounded-full border border-white/25 bg-black/20 px-3 py-1 text-xs font-bold text-white backdrop-blur-sm">
+            {category}
+          </span>
+          <span className="absolute bottom-4 left-4 inline-flex items-center gap-1 text-sm font-bold text-white">
+            View details <ArrowUpRight aria-hidden="true" className="size-4" />
+          </span>
         </div>
-        <div className="grow space-y-3">
-          <CardTitle className="line-clamp-1 text-2xl font-bold text-amber-950">
-            {name}
-          </CardTitle>
-          {description && (
-            <CardDescription className="min-h-10 line-clamp-2 text-gray-600">
-              {description}
-            </CardDescription>
-          )}
-          <p className="pt-2 text-2xl font-bold text-amber-900">
-            ETB {price.toFixed(2)}
+        <div className="min-w-0 p-5 pb-4">
+          <div className="flex items-start justify-between gap-3">
+            <h2 className="min-w-0 text-lg font-extrabold tracking-[-.02em] text-[#2f1a12] transition-colors group-hover:text-[#9b5828]">
+              {name}
+            </h2>
+            <p className="shrink-0 text-sm font-extrabold tabular-nums text-[#9b5828]">
+              ETB {price.toFixed(2)}
+            </p>
+          </div>
+          <p className="mt-2 min-h-10 text-sm leading-5 text-[#786050]">
+            {description || "Made to order for your next pickup."}
           </p>
         </div>
       </Link>
-      <Button
-        onClick={addToCart}
-        disabled={isPending}
-        className="mt-4 min-h-12 w-full bg-amber-600 py-3 text-base font-semibold text-amber-50 hover:bg-amber-700"
-        size="lg"
-      >
-        <Plus aria-hidden="true" className="size-5" /> Add to cart
-      </Button>
-      <Button
-        type="button"
-        variant="outline"
-        onClick={toggleFavorite}
-        disabled={isPending || savingFavorite}
-        aria-pressed={isFavorite}
-        className="mt-2 min-h-11 w-full border-amber-300 bg-white text-amber-900 hover:bg-amber-50"
-      >
-        <Heart aria-hidden="true" className={`size-4 ${isFavorite ? "fill-current" : ""}`} />
-        {savingFavorite ? "Saving…" : isFavorite ? "Saved" : "Save for later"}
-      </Button>
-    </Card>
+
+      <div className="mt-auto flex gap-2 px-5 pb-5">
+        <AddToCartButton
+          productId={id}
+          name={name}
+          price={price}
+          imageUrl={imageUrl}
+          className="min-h-11 flex-1 rounded-xl bg-[#3b2116] px-3 text-sm hover:bg-[#5a3020]"
+        />
+        {showFavorite ? (
+          <Button
+            type="button"
+            variant="outline"
+            onClick={toggleFavorite}
+            disabled={isPending || savingFavorite}
+            aria-label={isFavorite ? `Remove ${name} from saved items` : `Save ${name} for later`}
+            aria-pressed={isFavorite}
+            className="size-11 shrink-0 rounded-xl border-[#d9b98f] bg-white p-0 text-[#7d4018] hover:bg-[#fff4df] hover:text-[#7d4018]"
+          >
+            <Heart
+              aria-hidden="true"
+              className={`size-4 ${isFavorite ? "fill-current" : ""}`}
+            />
+          </Button>
+        ) : null}
+      </div>
+    </article>
   );
 };
 
