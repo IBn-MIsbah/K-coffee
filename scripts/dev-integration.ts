@@ -24,6 +24,10 @@ const child = spawn("npx", ["next", "dev", ...args], {
     ...process.env,
     DATABASE_URL: databaseUrl.toString(),
     BETTER_AUTH_URL: `http://localhost:${port}`,
+    // Keep the browser server in a development/test context even when the
+    // developer's .env contains production deployment markers.
+    NODE_ENV: "development",
+    DEPLOY_ENV: "test",
     E2E_TEST_MODE: "true",
     NEXT_DIST_DIR: ".next-integration",
   },

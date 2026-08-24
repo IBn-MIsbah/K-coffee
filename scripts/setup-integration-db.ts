@@ -37,7 +37,10 @@ async function main() {
   });
   execFileSync("npx", ["prisma", "db", "seed"], {
     stdio: "inherit",
-    env: { ...process.env, DATABASE_URL: testUrl.toString(), TEST_DATABASE_URL: testUrl.toString(), NODE_ENV: "development" },
+    // The guarded database name always contains "test". Override deployment
+    // markers inherited from a developer's .env so the development fixture
+    // seed cannot mistake this disposable database for production.
+    env: { ...process.env, DATABASE_URL: testUrl.toString(), TEST_DATABASE_URL: testUrl.toString(), NODE_ENV: "development", DEPLOY_ENV: "test" },
   });
 }
 

@@ -62,3 +62,12 @@ jobs:
 
       - name: Build production application
         run: npm run build
+
+      - name: Seed disposable browser-test data
+        run: npx prisma db seed
+
+      - name: Install Chromium for browser tests
+        run: npx playwright install --with-deps chromium
+
+      - name: Run browser role flows
+        run: INTEGRATION_DATABASE_NAME=k_coffee_ci npm run test:e2e
