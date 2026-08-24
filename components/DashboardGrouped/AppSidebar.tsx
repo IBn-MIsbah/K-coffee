@@ -34,6 +34,13 @@ type Item = {
 };
 const work: Item[] = [
   {
+    title: "Home",
+    url: "/dashboard",
+    icon: LayoutDashboard,
+    roles: ["USER"],
+    exact: true,
+  },
+  {
     title: "My orders",
     url: "/dashboard/orders",
     icon: ReceiptText,
