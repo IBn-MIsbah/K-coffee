@@ -5,11 +5,15 @@ import { useState } from "react";
 export default function AccountSettings({
   name,
   phone,
+  stores,
+  defaultStoreId,
 }: {
   name: string;
   phone: string;
+  stores: { id: string; name: string; address: string }[];
+  defaultStoreId: string | null;
 }) {
-  const [profile, setProfile] = useState({ name, phone });
+  const [profile, setProfile] = useState({ name, phone, defaultStoreId: defaultStoreId ?? "" });
   const [password, setPassword] = useState({ current: "", next: "" });
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
@@ -19,7 +23,7 @@ export default function AccountSettings({
     const r = await fetch("/api/account/profile", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(profile),
+      body: JSON.stringify(stores.length ? profile : { name: profile.name, phone: profile.phone }),
     });
     setMessage(r.ok ? "Profile saved." : (await r.json()).error);
     setBusy(false);
@@ -61,6 +65,18 @@ export default function AccountSettings({
             className="mt-2 min-h-11 w-full rounded-xl border border-[#dfc6a9] bg-white px-3"
           />
         </label>
+        {stores.length > 0 && <label className="mt-4 block text-sm font-semibold">
+          Default pickup location
+          <select
+            value={profile.defaultStoreId}
+            onChange={(e) => setProfile({ ...profile, defaultStoreId: e.target.value })}
+            className="mt-2 min-h-11 w-full rounded-xl border border-[#dfc6a9] bg-white px-3"
+          >
+            <option value="">Choose at checkout</option>
+            {stores.map((store) => <option key={store.id} value={store.id}>{store.name} — {store.address}</option>)}
+          </select>
+          <span className="mt-2 block text-xs font-normal leading-5 text-[#725b4c]">Checkout will select this location first. You can always choose another active store and pickup slot.</span>
+        </label>}
         <Button
           disabled={busy}
           className="mt-5 min-h-11 w-full bg-[#b56527] hover:bg-[#934817]"

@@ -1,11 +1,13 @@
 import { requirePageSession } from "@/lib/authz";
+import { getDefaultStoreId } from "@/lib/account/profile-validation";
 import prisma from "@/lib/prisma";
+import { UserRole } from "@/lib/rbac";
 import { Mail, Phone, ShieldCheck } from "lucide-react";
 import AccountSettings from "./account-settings";
 
 export default async function ProfilePage() {
   const actor = await requirePageSession("/dashboard/profile");
-  const user = await prisma.user.findUnique({
+  const [user, stores] = await Promise.all([prisma.user.findUnique({
     where: { id: actor.id },
     select: {
       name: true,
@@ -14,8 +16,9 @@ export default async function ProfilePage() {
       role: true,
       image: true,
       createdAt: true,
+      preferences: true,
     },
-  });
+  }), actor.role === UserRole.USER ? prisma.storeLocation.findMany({ where: { isActive: true }, select: { id: true, name: true, address: true }, orderBy: { name: "asc" } }) : Promise.resolve([])]);
   if (!user) return null;
   return (
     <section className="mx-auto max-w-4xl">
@@ -68,7 +71,7 @@ export default async function ProfilePage() {
           </div>
         </dl>
       </div>
-      <AccountSettings name={user.name ?? ""} phone={user.phone ?? ""} />
+      <AccountSettings name={user.name ?? ""} phone={user.phone ?? ""} stores={stores} defaultStoreId={getDefaultStoreId(user.preferences)} />
     </section>
   );
 }

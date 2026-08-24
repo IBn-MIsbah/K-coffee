@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 
 import prisma from "@/lib/prisma";
 import { getCurrentActor } from "@/lib/authz";
+import { getDefaultStoreId } from "@/lib/account/profile-validation";
 import { UserRole } from "@/lib/rbac";
 import { redirect } from "next/navigation";
 import CheckoutClient from "./checkout-client";
@@ -15,7 +16,7 @@ export default async function CheckoutPage() {
   }
   if (actor.role !== UserRole.USER) redirect("/unauthorized");
 
-  const stores = await prisma.storeLocation.findMany({
+  const [stores, customer] = await Promise.all([prisma.storeLocation.findMany({
     where: { isActive: true },
     select: {
       id: true,
@@ -26,7 +27,8 @@ export default async function CheckoutPage() {
       pickupLeadTimeMinutes: true,
     },
     orderBy: { name: "asc" },
-  });
+  }), prisma.user.findUnique({ where: { id: actor.id }, select: { preferences: true } })]);
   if (!stores.length) redirect("/cart");
-  return <CheckoutClient stores={stores} />;
+  const defaultStoreId = getDefaultStoreId(customer?.preferences);
+  return <CheckoutClient stores={stores} defaultStoreId={stores.some((store) => store.id === defaultStoreId) ? defaultStoreId : null} />;
 }

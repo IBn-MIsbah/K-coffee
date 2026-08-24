@@ -23,11 +23,11 @@ function makeSlots(store: Store) {
   return slots;
 }
 
-export default function CheckoutClient({ stores }: { stores: Store[] }) {
+export default function CheckoutClient({ stores, defaultStoreId }: { stores: Store[]; defaultStoreId: string | null }) {
   const router = useRouter();
   const items = useCart((state) => state.items);
   const clearCart = useCart((state) => state.clearCart);
-  const [storeId, setStoreId] = useState(stores[0].id);
+  const [storeId, setStoreId] = useState(defaultStoreId ?? stores[0].id);
   const store = stores.find((value) => value.id === storeId) ?? stores[0];
   const slots = useMemo(() => makeSlots(store), [store]);
   const [pickupTime, setPickupTime] = useState("");
