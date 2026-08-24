@@ -7,10 +7,16 @@ import { CatalogueConflictError, createAdminCategory, createAdminProduct, setAdm
 
 const actor = { id: "", email: "integration-admin@k-coffee.test", name: "Integration Admin", role: UserRole.ADMIN };
 
-beforeEach(async () => {
+async function removeFixtures() {
   await prisma.auditLog.deleteMany({ where: { user: { email: actor.email } } });
-  await prisma.product.deleteMany({ where: { name: { startsWith: "Integration " } } });
+  // Clean by the fixture category rather than product name. This also removes
+  // incomplete fixture products left by a failed/interrupted earlier run.
+  await prisma.product.deleteMany({ where: { category: { slug: { startsWith: "integration-" } } } });
   await prisma.category.deleteMany({ where: { slug: { startsWith: "integration-" } } });
+}
+
+beforeEach(async () => {
+  await removeFixtures();
   const user = await prisma.user.upsert({
     where: { email: actor.email },
     update: { role: UserRole.ADMIN },
@@ -20,7 +26,10 @@ beforeEach(async () => {
   actor.id = user.id;
 });
 
-afterAll(async () => { await prisma.$disconnect(); });
+afterAll(async () => {
+  await removeFixtures();
+  await prisma.$disconnect();
+});
 
 describe("catalogue lifecycle services", () => {
   it("records category and product changes and blocks archiving active product categories", async () => {
