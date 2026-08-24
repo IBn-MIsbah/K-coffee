@@ -53,3 +53,7 @@ export function sendVerificationEmail(to: string, url: string) {
     text: `Welcome to K-Coffee. Verify your email address using this link:\n\n${url}\n\nIf you did not create an account, you can safely ignore this email.`,
   });
 }
+
+export function sendOrderNotificationEmail(to: string, subject: string, text: string) {
+  return sendAuthEmail({ to, subject, text });
+}

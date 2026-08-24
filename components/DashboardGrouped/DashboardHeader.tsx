@@ -8,6 +8,7 @@ const labels: Record<string, string> = {
   "/dashboard/cashier": "Pickup queue",
   "/dashboard/profile": "Profile",
   "/dashboard/orders": "My orders",
+  "/dashboard/notifications": "Notifications",
   "/dashboard/admin/staff": "Staff access",
   "/dashboard/admin/audit": "Audit log",
 };

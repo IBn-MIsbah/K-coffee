@@ -4,6 +4,8 @@ import { canCancelOrder } from "@/lib/order-policy";
 import { customerOrderHistoryStatuses, type CustomerOrderHistoryFilters } from "@/lib/orders/customer-order-validation";
 import prisma from "@/lib/prisma";
 import { UserRole } from "@/lib/rbac";
+import { NotificationEvent } from "@/app/generated/prisma/client";
+import { notifyOrderCustomer } from "@/lib/notifications/order-notification-service";
 import { buildCustomerReorderPreview } from "./reorder-policy";
 
 export async function listCustomerOrders(actor: AuthenticatedActor, filters: CustomerOrderHistoryFilters) {
@@ -42,7 +44,7 @@ export async function cancelCustomerOrder(
   orderId: string,
 ) {
   if (actor.role !== UserRole.USER) throw new AuthorizationError();
-  return prisma.$transaction(async (tx) => {
+  const updated = await prisma.$transaction(async (tx) => {
     const order = await tx.order.findFirst({
       where: { id: orderId, userId: actor.id },
     });
@@ -65,6 +67,8 @@ export async function cancelCustomerOrder(
     });
     return updated;
   });
+  await notifyOrderCustomer(updated.id, NotificationEvent.ORDER_CANCELLED);
+  return updated;
 }
 
 export async function getCustomerReorderPreview(

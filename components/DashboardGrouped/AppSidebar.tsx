@@ -1,5 +1,6 @@
 "use client";
 import {
+  Bell,
   ClipboardList,
   Coffee,
   FolderCog,
@@ -44,6 +45,13 @@ const work: Item[] = [
     title: "My orders",
     url: "/dashboard/orders",
     icon: ReceiptText,
+    roles: ["USER"],
+    exact: true,
+  },
+  {
+    title: "Notifications",
+    url: "/dashboard/notifications",
+    icon: Bell,
     roles: ["USER"],
     exact: true,
   },
@@ -104,9 +112,11 @@ const admin: Item[] = [
 export default function AppSidebar({
   role,
   name,
+  unreadNotificationCount = 0,
 }: {
   role: string | null | undefined;
   name?: string | null;
+  unreadNotificationCount?: number;
 }) {
   const path = usePathname();
   const visible = (items: Item[]) =>
@@ -124,6 +134,11 @@ export default function AppSidebar({
             <Link href={i.url}>
               <i.icon aria-hidden="true" className="size-4" />
               <span>{i.title}</span>
+              {i.url === "/dashboard/notifications" && unreadNotificationCount > 0 && (
+                <span className="ml-auto rounded-full bg-[#b56527] px-2 py-0.5 text-xs font-bold text-white" aria-label={`${unreadNotificationCount} unread notifications`}>
+                  {unreadNotificationCount > 99 ? "99+" : unreadNotificationCount}
+                </span>
+              )}
             </Link>
           </SidebarMenuButton>
         </SidebarMenuItem>

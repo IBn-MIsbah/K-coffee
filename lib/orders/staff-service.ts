@@ -4,6 +4,7 @@ import { type AuthenticatedActor, AuthorizationError } from "@/lib/authz";
 import { canTransitionOrder, orderStatusTransitions } from "@/lib/order-policy";
 import prisma from "@/lib/prisma";
 import { UserRole } from "@/lib/rbac";
+import { notifyOrderCustomer } from "@/lib/notifications/order-notification-service";
 
 export class IllegalOrderTransitionError extends Error {
   constructor(currentStatus: OrderStatus, nextStatus: OrderStatus) {
@@ -50,7 +51,7 @@ export async function getStaffOrderAudit(actor: AuthenticatedActor, orderId: str
 
 export async function transitionStaffOrder(actor: AuthenticatedActor, orderId: string, nextStatus: OrderStatus) {
   const storeIds = await scope(actor);
-  return prisma.$transaction(async (tx) => {
+  const result = await prisma.$transaction(async (tx) => {
     const order = await tx.order.findUnique({ where: { id: orderId } });
     if (!order || (storeIds && !storeIds.includes(order.storeId))) throw new AuthorizationError();
     if (!canTransitionOrder({ id: actor.id, role: actor.role, storeId: order.storeId }, order, nextStatus)) throw new IllegalOrderTransitionError(order.status, nextStatus);
@@ -58,4 +59,6 @@ export async function transitionStaffOrder(actor: AuthenticatedActor, orderId: s
     await tx.auditLog.create({ data: { userId: actor.id, userRole: actor.role, action: "update", resource: "orders", resourceId: orderId, details: { before: order.status, after: nextStatus, storeId: order.storeId } } });
     return { ...updated, nextStatuses: orderStatusTransitions[nextStatus] };
   });
+  if (result.status === OrderStatus.READY_FOR_PICKUP) await notifyOrderCustomer(result.id, "ORDER_READY");
+  return result;
 }

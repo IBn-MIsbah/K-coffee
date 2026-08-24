@@ -1,8 +1,9 @@
 import "server-only";
 
-import { Prisma } from "@/app/generated/prisma/client";
+import { NotificationEvent, Prisma } from "@/app/generated/prisma/client";
 import { type AuthenticatedActor } from "@/lib/authz";
 import prisma from "@/lib/prisma";
+import { notifyOrderCustomer } from "@/lib/notifications/order-notification-service";
 
 export const VAT_RATE = new Prisma.Decimal("0.15");
 export const ORDER_CURRENCY = "ETB";
@@ -109,5 +110,6 @@ export async function createPickupOrder(actor: AuthenticatedActor, input: Pickup
     },
     select: { id: true, orderNumber: true },
   });
+  await notifyOrderCustomer(order.id, NotificationEvent.ORDER_RECEIVED);
   return { ...order, reused: false };
 }
