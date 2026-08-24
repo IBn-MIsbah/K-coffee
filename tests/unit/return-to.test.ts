@@ -7,6 +7,7 @@ describe("safeReturnTo", () => {
     expect(safeReturnTo("/checkout")).toBe("/checkout");
     expect(safeReturnTo("/dashboard/orders/order_123")).toBe("/dashboard/orders/order_123");
     expect(safeReturnTo("/orders/order_123")).toBe("/orders/order_123");
+    expect(safeReturnTo(`/staff/accept?token=${"a".repeat(32)}`)).toBe(`/staff/accept?token=${"a".repeat(32)}`);
   });
 
   it("drops query values until they are explicitly supported", () => {
@@ -22,5 +23,6 @@ describe("safeReturnTo", () => {
   it("creates login URLs from only safe targets", () => {
     expect(loginUrlFor("/cart")).toBe("/login?callbackUrl=%2Fcart");
     expect(loginUrlFor("https://attacker.example")).toBe("/login?callbackUrl=%2Fdashboard");
+    expect(loginUrlFor(`/staff/accept?token=${"a".repeat(32)}`)).toBe(`/login?callbackUrl=${encodeURIComponent(`/staff/accept?token=${"a".repeat(32)}`)}`);
   });
 });
