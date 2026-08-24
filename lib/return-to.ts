@@ -1,6 +1,6 @@
 const FALLBACK_RETURN_TO = "/dashboard";
 
-const allowedPathPrefixes = ["/admin", "/cart", "/checkout", "/dashboard", "/orders", "/pos"];
+const allowedPathPrefixes = ["/admin", "/cart", "/checkout", "/dashboard", "/menu", "/orders", "/pos"];
 const staffInvitationToken = /^[A-Za-z0-9_-]{32,128}$/;
 
 export function safeReturnTo(value: string | null | undefined): string {

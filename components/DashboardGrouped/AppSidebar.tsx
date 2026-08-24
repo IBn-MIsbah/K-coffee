@@ -8,6 +8,7 @@ import {
   LayoutDashboard,
   ReceiptText,
   Store,
+  ShoppingBag,
   UserRound,
   UtensilsCrossed,
 } from "lucide-react";
@@ -40,6 +41,12 @@ const work: Item[] = [
     icon: LayoutDashboard,
     roles: ["USER"],
     exact: true,
+  },
+  {
+    title: "Order menu",
+    url: "/menu",
+    icon: ShoppingBag,
+    roles: ["USER"],
   },
   {
     title: "My orders",

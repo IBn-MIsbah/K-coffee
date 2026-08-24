@@ -5,6 +5,7 @@ describe("safeReturnTo", () => {
   it("allows known internal protected routes", () => {
     expect(safeReturnTo("/cart")).toBe("/cart");
     expect(safeReturnTo("/checkout")).toBe("/checkout");
+    expect(safeReturnTo("/menu")).toBe("/menu");
     expect(safeReturnTo("/dashboard/orders/order_123")).toBe("/dashboard/orders/order_123");
     expect(safeReturnTo("/orders/order_123")).toBe("/orders/order_123");
     expect(safeReturnTo(`/staff/accept?token=${"a".repeat(32)}`)).toBe(`/staff/accept?token=${"a".repeat(32)}`);
@@ -15,7 +16,7 @@ describe("safeReturnTo", () => {
   });
 
   it("rejects external, malformed, and unsupported targets", () => {
-    for (const value of ["https://attacker.example", "//attacker.example", "javascript:alert(1)", "\\\\attacker.example", "/menu", " "]) {
+    for (const value of ["https://attacker.example", "//attacker.example", "javascript:alert(1)", "\\\\attacker.example", " "]) {
       expect(safeReturnTo(value)).toBe("/dashboard");
     }
   });
