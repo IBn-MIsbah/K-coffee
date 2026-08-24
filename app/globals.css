@@ -137,3 +137,10 @@
 }
 
 .dashboard-page-enter { animation: dashboard-page-enter 260ms cubic-bezier(.2,.8,.2,1) both; }
+
+@keyframes auth-card-enter {
+  from { opacity: 0; transform: translateY(10px) scale(.99); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.auth-card-enter { animation: auth-card-enter 280ms cubic-bezier(.2,.8,.2,1) both; }

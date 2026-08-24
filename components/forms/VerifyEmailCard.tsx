@@ -3,39 +3,86 @@
 import Link from "next/link";
 import { CheckCircle2, MailCheck, RefreshCw } from "lucide-react";
 import { useState } from "react";
-import { sendVerificationEmail } from "@/lib/auth-client";
-import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
-export default function VerifyEmailCard({
-  email,
-  verified,
-}: {
+import AuthPageHeader from "@/components/auth/AuthPageHeader";
+import { Button } from "@/components/ui/button";
+import { sendVerificationEmail } from "@/lib/auth-client";
+
+type VerifyEmailCardProps = {
   email: string | null;
   verified: boolean;
-}) {
+  returnTo: string;
+};
+
+export default function VerifyEmailCard({ email, verified, returnTo }: VerifyEmailCardProps) {
   const [sending, setSending] = useState(false);
   const [message, setMessage] = useState("");
+  const loginHref = `/login?callbackUrl=${encodeURIComponent(returnTo)}`;
 
   async function resend() {
     if (!email) return;
     setSending(true);
     setMessage("");
+
     try {
-      const result = await sendVerificationEmail({
-        email,
-        callbackURL: `${window.location.origin}/verify-email`,
-      });
-      setMessage(result.error ? "We could not send a new link. Please try again shortly." : "A new verification link has been sent.");
+      const callbackUrl = new URL("/verify-email", window.location.origin);
+      callbackUrl.searchParams.set("returnTo", returnTo);
+      const result = await sendVerificationEmail({ email, callbackURL: callbackUrl.toString() });
+      const nextMessage = result.error
+        ? "We could not send a new link. Please wait a moment and try again."
+        : "A new verification link has been sent. Check your inbox and spam folder.";
+      setMessage(nextMessage);
+      if (result.error) toast.error(nextMessage); else toast.success("A new verification email has been sent.");
     } catch {
-      setMessage("We could not send a new link. Please try again shortly.");
+      const nextMessage = "We could not send a new link. Please wait a moment and try again.";
+      setMessage(nextMessage);
+      toast.error(nextMessage);
     } finally {
       setSending(false);
     }
   }
 
   if (!email) {
-    return <section className="rounded-2xl bg-white p-8 text-center shadow-xl"><MailCheck aria-hidden="true" className="mx-auto size-10 text-amber-700" /><h1 className="mt-5 text-3xl font-bold text-gray-900">Email verification</h1><p className="mt-3 text-gray-600">Your verification link has been processed. Sign in to view your account status.</p><Button asChild className="mt-7 min-h-11 bg-amber-600 hover:bg-amber-700"><Link href="/login">Sign in</Link></Button></section>;
+    return (
+      <div className="space-y-8 text-center">
+        <div className="mx-auto grid size-12 place-items-center rounded-2xl bg-amber-100 text-amber-900 dark:bg-amber-950/70 dark:text-amber-200"><MailCheck aria-hidden="true" className="size-6" /></div>
+        <AuthPageHeader eyebrow="Email verification" title="Sign in to check your email status" description="Your verification link has been processed. Sign in to view your account status or request another email." className="text-left" />
+        <Button asChild className="h-12 w-full rounded-xl bg-[#7c3f1d] text-base font-semibold text-white hover:bg-[#663115] dark:bg-amber-400 dark:text-stone-950 dark:hover:bg-amber-300">
+          <Link href={loginHref}>Sign in</Link>
+        </Button>
+      </div>
+    );
   }
 
-  return <section className="rounded-2xl bg-white p-8 text-center shadow-xl"><span className={`mx-auto grid size-12 place-items-center rounded-full ${verified ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"}`}>{verified ? <CheckCircle2 aria-hidden="true" className="size-7" /> : <MailCheck aria-hidden="true" className="size-7" />}</span><h1 className="mt-5 text-3xl font-bold text-gray-900">{verified ? "Your email is verified" : "Verify your email"}</h1><p className="mt-3 text-gray-600">{verified ? "Your K-Coffee account is ready to use." : `We sent a verification link to ${email}. Open it to confirm your address.`}</p>{!verified && <Button type="button" onClick={resend} disabled={sending} variant="outline" className="mt-7 min-h-11 border-amber-300 text-amber-900 hover:bg-amber-50"><RefreshCw aria-hidden="true" className="size-4" /> {sending ? "Sending…" : "Resend verification link"}</Button>}{message && <p role="status" className="mt-4 text-sm text-gray-600">{message}</p>}<Link href="/dashboard" className="mt-6 block text-sm font-semibold text-amber-800 underline">Continue to your account</Link></section>;
+  if (verified) {
+    return (
+      <div className="space-y-8">
+        <div className="grid size-12 place-items-center rounded-2xl bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-200"><CheckCircle2 aria-hidden="true" className="size-6" /></div>
+        <AuthPageHeader eyebrow="Email verified" title="Your account is ready" description="Your email address has been confirmed. You can now continue with K-Coffee." />
+        <Button asChild className="h-12 w-full rounded-xl bg-[#7c3f1d] text-base font-semibold text-white hover:bg-[#663115] dark:bg-amber-400 dark:text-stone-950 dark:hover:bg-amber-300">
+          <Link href={returnTo}>Continue</Link>
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-8">
+      <div className="grid size-12 place-items-center rounded-2xl bg-amber-100 text-amber-900 dark:bg-amber-950/70 dark:text-amber-200"><MailCheck aria-hidden="true" className="size-6" /></div>
+      <AuthPageHeader eyebrow="One more step" title="Verify your email" description="Open the verification link we sent to the address below. It helps keep your account recoverable and secure." />
+      <div className="rounded-2xl border border-amber-200 bg-amber-50/80 p-4 text-sm leading-6 text-amber-950 dark:border-amber-900/70 dark:bg-amber-950/35 dark:text-amber-100">
+        Sent to <span className="font-semibold break-all">{email}</span>
+      </div>
+      <div className="space-y-3">
+        <Button type="button" onClick={resend} disabled={sending} variant="outline" className="h-12 w-full rounded-xl border-amber-300 bg-transparent text-amber-950 hover:bg-amber-50 dark:border-amber-800 dark:text-amber-200 dark:hover:bg-amber-950/60">
+          <RefreshCw aria-hidden="true" className={sending ? "size-4 animate-spin" : "size-4"} /> {sending ? "Sending another link…" : "Resend verification link"}
+        </Button>
+        {message ? <p role="status" className="rounded-xl bg-stone-100 px-4 py-3 text-sm leading-6 text-stone-700 dark:bg-stone-800 dark:text-stone-200">{message}</p> : null}
+        <Button asChild variant="ghost" className="h-11 w-full rounded-xl text-stone-700 hover:bg-stone-100 dark:text-stone-200 dark:hover:bg-stone-800">
+          <Link href={returnTo}>Continue without verifying</Link>
+        </Button>
+      </div>
+    </div>
+  );
 }
