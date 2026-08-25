@@ -13,6 +13,7 @@ const mocks = vi.hoisted(() => {
     listAdminCategories: vi.fn(),
     createAdminProduct: vi.fn(),
     listAdminProducts: vi.fn(),
+    getAdminOverviewMetrics: vi.fn(),
     parseCategoryInput: vi.fn((input) => input),
     parseProductInput: vi.fn((input) => input),
   };
@@ -23,10 +24,13 @@ vi.mock("@/lib/admin/store-service", () => ({ createAdminStore: mocks.createAdmi
 vi.mock("@/lib/admin/catalogue-service", () => ({ createAdminCategory: mocks.createAdminCategory, listAdminCategories: mocks.listAdminCategories, createAdminProduct: mocks.createAdminProduct, listAdminProducts: mocks.listAdminProducts }));
 vi.mock("@/lib/admin/catalogue-validation", () => ({ CatalogueValidationError: class CatalogueValidationError extends Error {}, parseCategoryInput: mocks.parseCategoryInput, parseProductInput: mocks.parseProductInput }));
 vi.mock("@/lib/admin/store-validation", () => ({ StoreValidationError: class StoreValidationError extends Error {} }));
+vi.mock("@/lib/orders/admin-metrics", () => ({ getAdminOverviewMetrics: mocks.getAdminOverviewMetrics }));
+vi.mock("@/app/(protected)/dashboard/(grouped)/admin/admin-overview", () => ({ default: () => null }));
 
 import { POST as createStore } from "@/app/api/admin/stores/route";
 import { POST as createCategory } from "@/app/api/admin/categories/route";
 import { POST as createProduct } from "@/app/api/admin/products/route";
+import AdminDashboard from "@/app/(protected)/dashboard/(grouped)/admin/page";
 
 const requests = [
   { name: "store", post: createStore, mutation: mocks.createAdminStore },
@@ -49,5 +53,18 @@ describe("admin mutation route authorization", () => {
     const response = await createProduct(new Request("http://localhost/api/admin/products", { method: "POST", body: "{}" }));
     expect(response.status).toBe(403);
     expect(mocks.createAdminProduct).not.toHaveBeenCalled();
+  });
+
+  it("uses the analytics permission before loading overview metrics", async () => {
+    mocks.requirePermission.mockResolvedValue({ id: "admin", role: "ADMIN" });
+    mocks.getAdminOverviewMetrics.mockResolvedValue({});
+
+    await AdminDashboard();
+
+    expect(mocks.requirePermission).toHaveBeenCalledWith({
+      action: "view_all",
+      resource: "analytics",
+    });
+    expect(mocks.getAdminOverviewMetrics).toHaveBeenCalledOnce();
   });
 });
