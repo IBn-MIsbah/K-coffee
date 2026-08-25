@@ -24,6 +24,7 @@ const focusRing = "focus-visible:outline-none focus-visible:ring-2 focus-visible
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isCartHydrated, setIsCartHydrated] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const wasOpenRef = useRef(false);
@@ -36,12 +37,26 @@ const Header = () => {
   const staffDestination = role === "CASHIER" ? "/pos" : "/admin/dashboard";
   const closeMenu = () => setIsOpen(false);
   const isActive = (url: string) => url === "/" ? pathname === url : pathname === url || pathname.startsWith(`${url}/`);
+  const displayedCartItemCount = isCartHydrated ? cartItemCount : 0;
+  const hasGlassSurface = isScrolled || pathname !== "/";
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 16);
     handleScroll();
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const markHydrated = () => setIsCartHydrated(true);
+    const unsubscribe = useCart.persist.onFinishHydration(markHydrated);
+    if (useCart.persist.hasHydrated()) markHydrated();
+
+    const fallbackTimer = window.setTimeout(markHydrated, 250);
+    return () => {
+      unsubscribe();
+      window.clearTimeout(fallbackTimer);
+    };
   }, []);
 
   useEffect(() => {
@@ -62,8 +77,8 @@ const Header = () => {
   }, [isOpen]);
 
   return (
-    <header className={`fixed inset-x-0 top-0 z-50 px-3 transition-[padding] duration-200 ease-out motion-reduce:transition-none sm:px-5 ${isScrolled ? "pt-3" : "pt-0"}`}>
-      <nav aria-label="Primary navigation" className={`mx-auto flex h-20 w-full max-w-7xl items-center gap-3 px-4 transition-[background-color,border-color,box-shadow,border-radius] duration-200 ease-out motion-reduce:transition-none sm:px-6 ${isScrolled ? "rounded-2xl border border-[#6c4a34]/70 bg-[#2c1911]/95 shadow-[0_12px_32px_rgba(42,23,13,.28)] backdrop-blur" : "bg-gradient-to-b from-black/70 to-transparent"}`}>
+    <header className={`fixed inset-x-0 top-0 z-50 px-3 transition-[padding] duration-200 ease-out motion-reduce:transition-none sm:px-5 ${hasGlassSurface ? "pt-3" : "pt-0"}`}>
+      <nav aria-label="Primary navigation" className={`mx-auto flex h-20 w-full max-w-7xl items-center gap-3 px-4 transition-[background-color,border-color,box-shadow,border-radius] duration-200 ease-out motion-reduce:transition-none sm:px-6 ${hasGlassSurface ? "rounded-2xl border border-[#8d654a]/55 bg-[#2c1911]/88 shadow-[0_12px_32px_rgba(42,23,13,.28)] backdrop-blur-xl" : "bg-gradient-to-b from-black/70 to-transparent"}`}>
         <Link href="/" aria-label="K-Coffee home" className={`flex shrink-0 items-center gap-2.5 rounded-xl py-2 text-amber-50 ${focusRing}`}>
           <span className="grid size-9 place-items-center rounded-xl bg-amber-500 font-serif text-lg font-black text-amber-950 shadow-sm">K</span>
           <span className="font-serif text-lg font-bold tracking-tight sm:text-xl">K-Coffee</span>
@@ -79,12 +94,14 @@ const Header = () => {
 
         <div className="ml-auto hidden shrink-0 items-center gap-1 xl:flex">
           {!session?.user && <><Link href="/login" className={`inline-flex min-h-11 items-center gap-2 rounded-lg px-3 text-sm font-bold text-amber-50 hover:bg-white/10 ${focusRing}`}><LogIn aria-hidden="true" className="size-4" />Sign in</Link><Link href="/register" className={`inline-flex min-h-11 items-center gap-2 rounded-full bg-amber-500 px-4 text-sm font-bold text-amber-950 transition-colors hover:bg-amber-400 ${focusRing}`}><UserPlus aria-hidden="true" className="size-4" />Register</Link></>}
-          {isCustomer && <><Link href="/dashboard/orders" className={`inline-flex min-h-11 items-center gap-2 rounded-lg px-3 text-sm font-bold text-amber-50 hover:bg-white/10 ${focusRing}`}><ReceiptText aria-hidden="true" className="size-4" />Orders</Link><Link href="/dashboard/profile" aria-label="View your profile" className={`grid size-11 place-items-center rounded-full bg-amber-500 text-amber-950 transition-colors hover:bg-amber-400 ${focusRing}`}><UserRound aria-hidden="true" className="size-5" /></Link><LogoutButton showIcon={false} className={`min-h-11 px-3 text-amber-50 hover:bg-white/10 hover:text-white ${focusRing}`} /></>}
+          {isCustomer && <>
+            <Link href="/cart" aria-current={isActive("/cart") ? "page" : undefined} aria-label={`View cart, ${displayedCartItemCount} ${displayedCartItemCount === 1 ? "item" : "items"}`} className={`relative inline-flex min-h-11 items-center gap-2 rounded-lg px-3 text-sm font-bold transition-colors ${focusRing} ${isActive("/cart") ? "bg-white/12 text-amber-200" : "text-amber-50 hover:bg-white/10 hover:text-amber-200"}`}><ShoppingCart aria-hidden="true" className="size-4" />Cart{displayedCartItemCount > 0 && <span aria-hidden="true" className="absolute -right-1 -top-1 grid min-w-5 place-items-center rounded-full bg-amber-400 px-1 text-xs font-bold leading-5 text-amber-950">{displayedCartItemCount > 99 ? "99+" : displayedCartItemCount}</span>}</Link>
+            <Link href="/dashboard/orders" className={`inline-flex min-h-11 items-center gap-2 rounded-lg px-3 text-sm font-bold text-amber-50 hover:bg-white/10 ${focusRing}`}><ReceiptText aria-hidden="true" className="size-4" />Orders</Link><Link href="/dashboard/profile" aria-label="View your profile" className={`grid size-11 place-items-center rounded-full bg-amber-500 text-amber-950 transition-colors hover:bg-amber-400 ${focusRing}`}><UserRound aria-hidden="true" className="size-5" /></Link><LogoutButton showIcon={false} className={`min-h-11 px-3 text-amber-50 hover:bg-white/10 hover:text-white ${focusRing}`} /></>}
           {isStaff && <><Link href={staffDestination} className={`inline-flex min-h-11 items-center gap-2 rounded-full bg-amber-500 px-4 text-sm font-bold text-amber-950 transition-colors hover:bg-amber-400 ${focusRing}`}><MonitorCog aria-hidden="true" className="size-4" />Workspace</Link><LogoutButton showIcon={false} className={`min-h-11 px-3 text-amber-50 hover:bg-white/10 hover:text-white ${focusRing}`} /></>}
         </div>
 
         <div className="ml-auto flex shrink-0 items-center gap-1 xl:hidden">
-          {isCustomer && <Link href="/cart" aria-label={`View cart, ${cartItemCount} ${cartItemCount === 1 ? "item" : "items"}`} className={`relative grid size-11 place-items-center rounded-full text-amber-50 transition-colors hover:bg-white/10 hover:text-amber-200 ${focusRing}`}><ShoppingCart aria-hidden="true" className="size-5" />{cartItemCount > 0 && <span aria-hidden="true" className="absolute -right-1 -top-1 grid min-w-5 place-items-center rounded-full bg-amber-400 px-1 text-xs font-bold leading-5 text-amber-950">{cartItemCount > 99 ? "99+" : cartItemCount}</span>}</Link>}
+          {isCustomer && <Link href="/cart" aria-current={isActive("/cart") ? "page" : undefined} aria-label={`View cart, ${displayedCartItemCount} ${displayedCartItemCount === 1 ? "item" : "items"}`} className={`relative grid size-11 place-items-center rounded-full transition-colors ${focusRing} ${isActive("/cart") ? "bg-white/12 text-amber-200" : "text-amber-50 hover:bg-white/10 hover:text-amber-200"}`}><ShoppingCart aria-hidden="true" className="size-5" />{displayedCartItemCount > 0 && <span aria-hidden="true" className="absolute -right-1 -top-1 grid min-w-5 place-items-center rounded-full bg-amber-400 px-1 text-xs font-bold leading-5 text-amber-950">{displayedCartItemCount > 99 ? "99+" : displayedCartItemCount}</span>}</Link>}
           <button ref={menuButtonRef} type="button" onClick={() => setIsOpen((open) => !open)} aria-label={isOpen ? "Close navigation menu" : "Open navigation menu"} aria-controls="mobile-navigation" aria-expanded={isOpen} className={`grid size-11 place-items-center rounded-xl bg-amber-500 text-amber-950 transition-colors hover:bg-amber-400 ${focusRing}`}>{isOpen ? <X aria-hidden="true" className="size-5" /> : <Menu aria-hidden="true" className="size-5" />}</button>
         </div>
       </nav>
@@ -106,7 +123,7 @@ const Header = () => {
           </ul>
           <div className="mt-auto space-y-2 border-t border-[#6c4a34]/70 pt-5">
             {!session?.user && <><Link href="/login" onClick={closeMenu} className={`flex min-h-12 items-center justify-center gap-2 rounded-xl border border-amber-400/70 text-sm font-bold text-amber-50 hover:bg-white/10 ${focusRing}`}><LogIn aria-hidden="true" className="size-4" />Sign in</Link><Link href="/register" onClick={closeMenu} className={`flex min-h-12 items-center justify-center gap-2 rounded-xl bg-amber-500 text-sm font-bold text-amber-950 hover:bg-amber-400 ${focusRing}`}><UserPlus aria-hidden="true" className="size-4" />Create account</Link></>}
-            {isCustomer && <><Link href="/dashboard/orders" onClick={closeMenu} className={`flex min-h-12 items-center justify-center gap-2 rounded-xl border border-amber-400/70 text-sm font-bold text-amber-50 hover:bg-white/10 ${focusRing}`}><ReceiptText aria-hidden="true" className="size-4" />My orders</Link><Link href="/cart" onClick={closeMenu} className={`flex min-h-12 items-center justify-center gap-2 rounded-xl bg-amber-500 text-sm font-bold text-amber-950 hover:bg-amber-400 ${focusRing}`}><ShoppingCart aria-hidden="true" className="size-4" />Cart ({cartItemCount})</Link></>}
+            {isCustomer && <><Link href="/dashboard/orders" onClick={closeMenu} className={`flex min-h-12 items-center justify-center gap-2 rounded-xl border border-amber-400/70 text-sm font-bold text-amber-50 hover:bg-white/10 ${focusRing}`}><ReceiptText aria-hidden="true" className="size-4" />My orders</Link><Link href="/cart" onClick={closeMenu} aria-current={isActive("/cart") ? "page" : undefined} className={`flex min-h-12 items-center justify-center gap-2 rounded-xl text-sm font-bold ${focusRing} ${isActive("/cart") ? "bg-amber-400 text-amber-950" : "bg-amber-500 text-amber-950 hover:bg-amber-400"}`}><ShoppingCart aria-hidden="true" className="size-4" />Cart{isCartHydrated ? ` (${displayedCartItemCount})` : ""}</Link></>}
             {isStaff && <Link href={staffDestination} onClick={closeMenu} className={`flex min-h-12 items-center justify-center gap-2 rounded-xl bg-amber-500 text-sm font-bold text-amber-950 hover:bg-amber-400 ${focusRing}`}><MonitorCog aria-hidden="true" className="size-4" />Open workspace</Link>}
           </div>
         </div>
